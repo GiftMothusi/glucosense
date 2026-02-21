@@ -1,11 +1,9 @@
-"""
-Glucose routes: /api/v1/glucose
-"""
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.security import get_current_user, get_current_premium_user
+
+from app.core.security import get_current_user
 from app.services.glucose_service import GlucoseService
 from app.schemas.schemas import (
     GlucoseReadingCreate, GlucoseReadingResponse,
@@ -90,10 +88,11 @@ async def glucose_stats(
 @router.get("/patterns")
 async def glucose_patterns(
     days: int = Query(default=30, ge=7, le=90),
-    current_user=Depends(get_current_premium_user),
+    # CHANGED: was get_current_premium_user — pure Python computation, no paid service
+    current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Premium: Detect glucose patterns."""
+    """Detect glucose patterns."""
     patterns = await GlucoseService.get_patterns(db, current_user.id, days=days)
     return {"patterns": [vars(p) for p in patterns]}
 
@@ -101,10 +100,11 @@ async def glucose_patterns(
 @router.get("/hourly-profile")
 async def hourly_profile(
     days: int = Query(default=30, ge=7, le=90),
-    current_user=Depends(get_current_premium_user),
+    # CHANGED: was get_current_premium_user — pure Python computation, no paid service
+    current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Premium: 24-hour average glucose profile."""
+    """24-hour average glucose profile."""
     profile = await GlucoseService.get_hourly_profile(db, current_user.id, days=days)
     return {"profile": profile}
 
@@ -115,8 +115,7 @@ async def daily_averages(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    if not current_user.is_premium and days > 30:
-        days = 30
+    # CHANGED: removed is_premium day cap — all users get full 365 days
     averages = await GlucoseService.get_daily_averages(db, current_user.id, days=days)
     return {"averages": averages}
 

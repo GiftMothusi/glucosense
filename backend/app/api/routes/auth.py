@@ -1,6 +1,3 @@
-"""
-Auth routes: /api/v1/auth
-"""
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession

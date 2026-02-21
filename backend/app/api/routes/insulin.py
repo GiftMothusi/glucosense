@@ -1,6 +1,3 @@
-"""
-Insulin routes: /api/v1/insulin
-"""
 from datetime import datetime, timezone, timedelta
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status

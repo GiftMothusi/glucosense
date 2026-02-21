@@ -1,6 +1,3 @@
-"""
-Meals routes: /api/v1/meals
-"""
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -22,14 +19,12 @@ async def log_meal(
 ):
     eaten_at = data.eaten_at or datetime.now(timezone.utc)
 
-    # Aggregate totals from items
     total_carbs = sum(i.carbs_g for i in data.items)
     total_protein = sum(i.protein_g for i in data.items)
     total_fat = sum(i.fat_g for i in data.items)
     total_cal = sum(i.calories for i in data.items)
     total_fiber = sum(i.fiber_g for i in data.items)
 
-    # Weighted average GI from items (by carb content)
     gi_items = [(i.glycemic_index, i.carbs_g) for i in data.items if i.glycemic_index]
     if gi_items and total_carbs > 0:
         avg_gi = sum(gi * carbs for gi, carbs in gi_items) / total_carbs

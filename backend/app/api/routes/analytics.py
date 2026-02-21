@@ -1,12 +1,9 @@
-"""
-Analytics routes: /api/v1/analytics
-"""
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.security import get_current_user, get_current_premium_user
+
+from app.core.security import get_current_user
 from app.services.glucose_service import GlucoseService
-from app.schemas.schemas import GlucoseStatsResponse, TIRResponse, InsightResponse
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -16,10 +13,6 @@ async def dashboard_summary(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Returns a full dashboard payload: latest reading, 7-day stats, TIR, recent insights.
-    Single endpoint to minimise mobile network calls.
-    """
     latest = await GlucoseService.get_latest(db, current_user.id)
     stats_7 = await GlucoseService.get_stats(db, current_user.id, days=7)
     stats_30 = await GlucoseService.get_stats(db, current_user.id, days=30)
@@ -33,10 +26,9 @@ async def dashboard_summary(
 
 @router.get("/weekly-report")
 async def weekly_report(
-    current_user=Depends(get_current_premium_user),
+    current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Premium: comprehensive weekly report."""
     stats = await GlucoseService.get_stats(db, current_user.id, days=7)
     patterns = await GlucoseService.get_patterns(db, current_user.id, days=30)
     daily = await GlucoseService.get_daily_averages(db, current_user.id, days=7)
@@ -50,10 +42,9 @@ async def weekly_report(
 
 @router.get("/insights")
 async def get_insights(
-    current_user=Depends(get_current_premium_user),
+    current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Premium: AI-generated insights."""
     patterns = await GlucoseService.get_patterns(db, current_user.id, days=30)
     return {
         "insights": [

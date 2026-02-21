@@ -4,7 +4,7 @@ from sqlalchemy.engine import Connection
 from alembic import context
 from app.core.config import settings
 from app.core.database import Base
-import app.models  # noqa: F401 — ensure all models are imported
+import app.models 
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)
@@ -18,9 +18,12 @@ target_metadata = Base.metadata
 def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url, target_metadata=target_metadata,
-        literal_binds=True, dialect_opts={"paramstyle": "named"},
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        include_schemas=True,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -28,7 +31,10 @@ def run_migrations_offline() -> None:
 
 def do_run_migrations(connection: Connection) -> None:
     context.configure(
-        connection=connection, target_metadata=target_metadata, compare_type=True
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        include_schemas=True,
     )
     with context.begin_transaction():
         context.run_migrations()
