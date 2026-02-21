@@ -88,7 +88,6 @@ async def glucose_stats(
 @router.get("/patterns")
 async def glucose_patterns(
     days: int = Query(default=30, ge=7, le=90),
-    # CHANGED: was get_current_premium_user — pure Python computation, no paid service
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -100,7 +99,6 @@ async def glucose_patterns(
 @router.get("/hourly-profile")
 async def hourly_profile(
     days: int = Query(default=30, ge=7, le=90),
-    # CHANGED: was get_current_premium_user — pure Python computation, no paid service
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -115,7 +113,6 @@ async def daily_averages(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # CHANGED: removed is_premium day cap — all users get full 365 days
     averages = await GlucoseService.get_daily_averages(db, current_user.id, days=days)
     return {"averages": averages}
 

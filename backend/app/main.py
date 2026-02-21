@@ -1,6 +1,3 @@
-"""
-GlucoSense API — FastAPI Application Entry Point
-"""
 import sentry_sdk
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
@@ -14,25 +11,19 @@ from app.core.config import settings
 from app.core.database import init_db
 from app.api import api_router
 
-# ─── Sentry (only in non-dev) ────────────────────────────────────────────────
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "development":
     sentry_sdk.init(dsn=settings.SENTRY_DSN, traces_sample_rate=0.1)
 
-# ─── Rate Limiter ─────────────────────────────────────────────────────────────
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 
-# ─── Lifespan ─────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     if settings.ENVIRONMENT == "development":
         await init_db()
     yield
-    # Shutdown — cleanup if needed
 
 
-# ─── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -42,7 +33,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ─── Middleware ───────────────────────────────────────────────────────────────
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -55,7 +45,6 @@ app.add_middleware(
 )
 
 
-# ─── Global Exception Handler ─────────────────────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
@@ -64,7 +53,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# ─── Routes ──────────────────────────────────────────────────────────────────
 app.include_router(api_router)
 
 

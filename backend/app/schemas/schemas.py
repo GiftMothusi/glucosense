@@ -1,7 +1,3 @@
-"""
-GlucoSense Pydantic Schemas
-All request and response models for the API.
-"""
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -13,8 +9,6 @@ from app.models.models import (
 
 MMOL_TO_MGDL = 18.0182
 
-
-# ─── Auth ─────────────────────────────────────────────────────────────────────
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -37,8 +31,6 @@ class TokenResponse(BaseModel):
 class RefreshRequest(BaseModel):
     refresh_token: str
 
-
-# ─── User ─────────────────────────────────────────────────────────────────────
 
 class UserProfileUpdate(BaseModel):
     date_of_birth: Optional[datetime] = None
@@ -111,8 +103,6 @@ class DiabetesProfileResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── Glucose ─────────────────────────────────────────────────────────────────
-
 class GlucoseReadingCreate(BaseModel):
     value: float = Field(gt=0, description="Glucose value in the user's preferred unit")
     unit: GlucoseUnit = GlucoseUnit.MMOL
@@ -122,7 +112,7 @@ class GlucoseReadingCreate(BaseModel):
     trend_rate: Optional[float] = None
     notes: Optional[str] = None
     meal_id: Optional[int] = None
-    recorded_at: Optional[datetime] = None  # defaults to now if not provided
+    recorded_at: Optional[datetime] = None  
 
     def to_mmol(self) -> float:
         if self.unit == GlucoseUnit.MGDL:
@@ -156,8 +146,6 @@ class GlucoseListResponse(BaseModel):
     page: int
     page_size: int
 
-
-# ─── Insulin ─────────────────────────────────────────────────────────────────
 
 class InsulinDoseCreate(BaseModel):
     insulin_name: str
@@ -205,8 +193,6 @@ class BolusCalculationResponse(BaseModel):
     recommended_bolus: float
     notes: str
 
-
-# ─── Meals ───────────────────────────────────────────────────────────────────
 
 class MealItemCreate(BaseModel):
     food_name: str
@@ -280,8 +266,6 @@ class FoodSearchResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── Activity ────────────────────────────────────────────────────────────────
-
 class ActivityCreate(BaseModel):
     activity_type: ActivityType
     intensity: ActivityIntensity = ActivityIntensity.MODERATE
@@ -311,8 +295,6 @@ class ActivityResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
-
-# ─── Analytics ───────────────────────────────────────────────────────────────
 
 class TIRResponse(BaseModel):
     in_range_pct: float
@@ -375,8 +357,6 @@ class WeeklyReportResponse(BaseModel):
     active_minutes: int
 
 
-# ─── Medication ───────────────────────────────────────────────────────────────
-
 class MedicationCreate(BaseModel):
     name: str
     dose: Optional[str] = None
@@ -399,8 +379,6 @@ class MedicationResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
-
-# ─── Care Portal ─────────────────────────────────────────────────────────────
 
 class CarePortalLinkCreate(BaseModel):
     label: str
@@ -426,8 +404,6 @@ class CarePortalLinkResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── Subscription ─────────────────────────────────────────────────────────────
-
 class SubscriptionResponse(BaseModel):
     plan: SubscriptionPlan
     status: str
@@ -435,8 +411,6 @@ class SubscriptionResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
-
-# ─── Emergency Contacts ───────────────────────────────────────────────────────
 
 class EmergencyContactCreate(BaseModel):
     name: str
@@ -461,8 +435,6 @@ class EmergencyContactResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── Supply Inventory ─────────────────────────────────────────────────────────
-
 class SupplyItemCreate(BaseModel):
     name: str
     quantity: float = Field(gt=0)
@@ -483,5 +455,4 @@ class SupplyItemResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# Update forward references
 UserDetailResponse.model_rebuild()
