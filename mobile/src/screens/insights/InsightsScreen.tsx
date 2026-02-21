@@ -47,7 +47,6 @@ export default function InsightsScreen() {
       >
         <Text style={styles.title}>Insights</Text>
 
-        {/* Period selector */}
         <View style={styles.periodRow}>
           {([7, 14, 30] as const).map((p) => (
             <TouchableOpacity key={p} style={[styles.periodBtn, period === p && styles.periodBtnActive]} onPress={() => setPeriod(p)}>
@@ -56,7 +55,6 @@ export default function InsightsScreen() {
           ))}
         </View>
 
-        {/* TIR */}
         {stats ? (
           <Card style={styles.tirCard}>
             <SectionHeader title={`Time In Range — ${period} days`} />
@@ -71,7 +69,6 @@ export default function InsightsScreen() {
               showLegend
             />
 
-            {/* Stats grid */}
             <View style={styles.statsGrid}>
               {[
                 { label: 'Average', value: `${stats.average_mmol.toFixed(1)} mmol/L` },
@@ -90,7 +87,6 @@ export default function InsightsScreen() {
           <EmptyState emoji="📊" title="Not enough data" subtitle="Log a few glucose readings to see your stats." />
         )}
 
-        {/* Insights / Patterns */}
         {user?.is_premium ? (
           <>
             <SectionHeader title="Patterns & Insights" style={{ marginTop: Spacing.lg }} />

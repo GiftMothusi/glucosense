@@ -67,7 +67,6 @@ export const TIRRing: React.FC<TIRRingProps> = ({
             })}
           </G>
         </Svg>
-        {/* Center label */}
         <View style={[styles.centerLabel, { width: size, height: size }]}>
           <Text style={styles.centerValue}>{Math.round(inRange)}%</Text>
           <Text style={styles.centerSubtext}>in range</Text>
@@ -89,7 +88,6 @@ export const TIRRing: React.FC<TIRRingProps> = ({
   );
 };
 
-// ─── Simple Line Sparkline ────────────────────────────────────────────────────
 interface SparklineProps {
   data: number[];
   width?: number;

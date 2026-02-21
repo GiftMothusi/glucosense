@@ -6,7 +6,6 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, BorderRadius, Typography, Shadows, Gradients } from '../../theme/theme';
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
 interface CardProps {
   children: React.ReactNode;
   style?: ViewStyle;
@@ -32,7 +31,6 @@ export const Card: React.FC<CardProps> = ({ children, style, onPress, variant = 
   return <View style={cardStyle}>{children}</View>;
 };
 
-// ─── Button ───────────────────────────────────────────────────────────────────
 interface ButtonProps {
   label: string;
   onPress: () => void;
@@ -107,7 +105,6 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-// ─── Input ────────────────────────────────────────────────────────────────────
 interface InputProps {
   label?: string;
   value: string;
@@ -159,7 +156,6 @@ export const Input: React.FC<InputProps> = ({
   );
 };
 
-// ─── GlucoseBadge ─────────────────────────────────────────────────────────────
 interface GlucoseBadgeProps {
   value: number;
   unit?: 'mmol' | 'mgdl';
@@ -202,7 +198,6 @@ export const GlucoseBadge: React.FC<GlucoseBadgeProps> = ({
   );
 };
 
-// ─── SectionHeader ────────────────────────────────────────────────────────────
 interface SectionHeaderProps {
   title: string;
   rightAction?: { label: string; onPress: () => void };
@@ -220,7 +215,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, rightAction
   </View>
 );
 
-// ─── EmptyState ───────────────────────────────────────────────────────────────
 interface EmptyStateProps {
   emoji: string;
   title: string;
@@ -239,7 +233,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ emoji, title, subtitle, 
   </View>
 );
 
-// ─── Pill / Tag ───────────────────────────────────────────────────────────────
 interface PillProps {
   label: string;
   color?: string;
@@ -252,9 +245,7 @@ export const Pill: React.FC<PillProps> = ({ label, color = Colors.accent, style 
   </View>
 );
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  // Card
   card: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
@@ -273,7 +264,6 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
 
-  // Button
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -313,8 +303,6 @@ const styles = StyleSheet.create({
   btnText_md: { fontSize: Typography.size.base },
   btnText_lg: { fontSize: Typography.size.md },
 
-
-  // Input
   inputWrapper: { gap: Spacing.xs },
   inputLabel: { color: Colors.textSecondary, fontSize: Typography.size.sm, fontWeight: '600' },
   inputContainer: {
@@ -339,24 +327,20 @@ const styles = StyleSheet.create({
   inputAdornment: { paddingHorizontal: Spacing.xs },
   inputErrorText: { color: Colors.error, fontSize: Typography.size.xs, fontWeight: '500' },
 
-  // Glucose badge
   glucoseBadge: { alignItems: 'center' },
   glucoseValue: { fontWeight: '700', letterSpacing: -1 },
   glucoseUnit: { fontWeight: '500', opacity: 0.8, marginTop: -2 },
   glucoseLabel: { fontWeight: '600', marginTop: 2 },
 
-  // Section header
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
   sectionTitle: { color: Colors.textHeading, fontSize: Typography.size.md, fontWeight: '700' },
   sectionAction: { color: Colors.primary, fontSize: Typography.size.sm, fontWeight: '600' },
 
-  // Empty state
   emptyState: { alignItems: 'center', paddingVertical: Spacing['3xl'], paddingHorizontal: Spacing['2xl'] },
   emptyEmoji: { fontSize: 48, marginBottom: Spacing.base },
   emptyTitle: { color: Colors.textPrimary, fontSize: Typography.size.lg, fontWeight: '700', textAlign: 'center' },
   emptySubtitle: { color: Colors.textSecondary, fontSize: Typography.size.base, textAlign: 'center', marginTop: Spacing.sm },
 
-  // Pill
   pill: { paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: BorderRadius.full, borderWidth: 1 },
   pillText: { fontSize: Typography.size.xs, fontWeight: '600' },
 });

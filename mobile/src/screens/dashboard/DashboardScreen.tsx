@@ -143,7 +143,6 @@ export default function DashboardScreen() {
           </Card>
         )}
 
-        {/* Quick Log Row */}
         <SectionHeader title="Quick Log" style={{ marginTop: Spacing.lg }} />
         <View style={styles.quickLogRow}>
           {[
@@ -164,7 +163,6 @@ export default function DashboardScreen() {
           ))}
         </View>
 
-        {/* Premium upsell if free */}
         {!user?.is_premium && (
           <Card style={styles.premiumCard} onPress={() => navigation.navigate('Profile')}>
             <View style={styles.premiumContent}>
@@ -193,7 +191,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingHorizontal: Spacing.base, paddingBottom: Spacing['2xl'], gap: Spacing.md },
 
-  // Header
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: Spacing.md },
   greeting: { color: Colors.textSecondary, fontSize: Typography.size.base },
   name: { color: Colors.textPrimary, fontSize: Typography.size.xl, fontWeight: '800' },
@@ -205,7 +202,6 @@ const styles = StyleSheet.create({
   },
   addBtnText: { color: Colors.textInverse, fontWeight: '700', fontSize: Typography.size.sm },
 
-  // Glucose card
   glucoseCard: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
@@ -224,7 +220,6 @@ const styles = StyleSheet.create({
   noReading: { color: Colors.textSecondary, fontSize: Typography.size.lg, fontWeight: '600' },
   noReadingHint: { color: Colors.textMuted, fontSize: Typography.size.sm, marginTop: 4 },
 
-  // TIR card
   tirCard: { padding: Spacing.lg },
   tirContent: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xl, marginTop: Spacing.md },
   tirStats: { flex: 1, gap: Spacing.sm },
@@ -232,7 +227,6 @@ const styles = StyleSheet.create({
   statLabel: { color: Colors.textSecondary, fontSize: Typography.size.sm },
   statValue: { color: Colors.textPrimary, fontSize: Typography.size.sm, fontWeight: '600' },
 
-  // Quick log
   quickLogRow: { flexDirection: 'row', gap: Spacing.sm },
   quickLogBtn: {
     flex: 1,
@@ -246,7 +240,6 @@ const styles = StyleSheet.create({
   quickLogEmoji: { fontSize: 24 },
   quickLogLabel: { color: Colors.textSecondary, fontSize: Typography.size.xs, fontWeight: '600' },
 
-  // Premium card
   premiumCard: {
     backgroundColor: Colors.primaryLight,
     borderWidth: 1,

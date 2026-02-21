@@ -48,7 +48,6 @@ export default function OnboardingScreen() {
       });
       await loadUser();
     } catch (e) {
-      // Allow skip
       await loadUser();
     } finally {
       setIsLoading(false);
@@ -57,7 +56,6 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Progress bar */}
       <View style={styles.progressBar}>
         {steps.map((_, i) => (
           <View key={i} style={[styles.progressDot, i <= step && styles.progressDotActive]} />

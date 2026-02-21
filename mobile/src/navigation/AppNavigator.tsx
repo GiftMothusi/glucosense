@@ -7,7 +7,6 @@ import { Colors, Spacing, Shadows } from '../theme/theme';
 import { useAuthStore } from '../store/authStore';
 import { getAccessToken } from '../services/api';
 
-// Tab icon components (replace with your icon library)
 const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => (
   <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
     {name === 'Dashboard' ? '🏠' :
@@ -17,7 +16,6 @@ const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => (
   </Text>
 );
 
-// Lazy screen imports
 const LoginScreen = React.lazy(() => import('../screens/auth/LoginScreen'));
 const RegisterScreen = React.lazy(() => import('../screens/auth/RegisterScreen'));
 const OnboardingScreen = React.lazy(() => import('../screens/auth/OnboardingScreen'));
