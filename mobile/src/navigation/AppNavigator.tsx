@@ -38,6 +38,10 @@ const RegisterScreen = React.lazy(() => import('../screens/auth/RegisterScreen')
 const OnboardingScreen = React.lazy(() => import('../screens/auth/OnboardingScreen'));
 
 const DashboardScreen = React.lazy(() => import('../screens/dashboard/DashboardScreen'));
+const GlucoseDashboardScreen = React.lazy(() => import('../screens/dashboard/GlucoseDashboardScreen'));
+const MealsDashboardScreen = React.lazy(() => import('../screens/dashboard/MealsDashboardScreen'));
+const InsulinDashboardScreen = React.lazy(() => import('../screens/dashboard/InsulinDashboardScreen'));
+const ActivitiesDashboardScreen = React.lazy(() => import('../screens/dashboard/ActivitiesDashboardScreen'));
 const LogGlucoseScreen = React.lazy(() => import('../screens/log/LogGlucoseScreen'));
 const LogMealScreen = React.lazy(() => import('../screens/log/LogMealScreen'));
 const LogInsulinScreen = React.lazy(() => import('../screens/log/LogInsulinScreen'));
@@ -74,10 +78,19 @@ export type LogStackParamList = {
   LogActivity: undefined;
 };
 
+export type DashboardStackParamList = {
+  DashboardHome: undefined;
+  GlucoseDashboard: undefined;
+  MealsDashboard: undefined;
+  InsulinDashboard: undefined;
+  ActivitiesDashboard: undefined;
+};
+
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const LogStack = createNativeStackNavigator<LogStackParamList>();
+const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
 
 const AuthNavigator = () => (
   <AuthStack.Navigator screenOptions={{ headerShown: false }}>
@@ -102,6 +115,22 @@ const LogNavigator = () => (
   </LogStack.Navigator>
 );
 
+const DashboardNavigator = () => (
+  <DashboardStack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: Colors.surface },
+      headerTintColor: Colors.textPrimary,
+      headerShadowVisible: false,
+    }}
+  >
+    <DashboardStack.Screen name="DashboardHome" component={DashboardScreen as any} options={{ title: 'Dashboard' }} />
+    <DashboardStack.Screen name="GlucoseDashboard" component={GlucoseDashboardScreen as any} options={{ title: 'Glucose' }} />
+    <DashboardStack.Screen name="MealsDashboard" component={MealsDashboardScreen as any} options={{ title: 'Meals' }} />
+    <DashboardStack.Screen name="InsulinDashboard" component={InsulinDashboardScreen as any} options={{ title: 'Insulin' }} />
+    <DashboardStack.Screen name="ActivitiesDashboard" component={ActivitiesDashboardScreen as any} options={{ title: 'Activities' }} />
+  </DashboardStack.Navigator>
+);
+
 const MainNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -121,7 +150,7 @@ const MainNavigator = () => (
       tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
     })}
   >
-    <Tab.Screen name="Dashboard" component={DashboardScreen as any} />
+    <Tab.Screen name="Dashboard" component={DashboardNavigator as any} />
     <Tab.Screen name="Log" component={LogNavigator} />
     <Tab.Screen name="Insights" component={InsightsScreen as any} />
     <Tab.Screen name="Care" component={CareScreen as any} />

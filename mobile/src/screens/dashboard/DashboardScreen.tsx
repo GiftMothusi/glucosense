@@ -148,18 +148,18 @@ export default function DashboardScreen() {
           </Card>
         )}
 
-        <SectionHeader title="Quick Log" style={{ marginTop: Spacing.lg }} />
+        <SectionHeader title="Analytics" style={{ marginTop: Spacing.lg }} />
         <View style={styles.quickLogRow}>
           {[
-            { icon: 'water-outline', label: 'Glucose', screen: 'LogGlucose', color: Colors.inRange },
-            { icon: 'restaurant-outline', label: 'Meal', screen: 'LogMeal', color: Colors.chartMeal },
-            { icon: 'medical-outline', label: 'Insulin', screen: 'LogInsulin', color: Colors.chartInsulin },
-            { icon: 'walk-outline', label: 'Activity', screen: 'LogActivity', color: Colors.chartActivity },
+            { icon: 'water-outline', label: 'Glucose', screen: 'GlucoseDashboard', color: Colors.inRange },
+            { icon: 'restaurant-outline', label: 'Meals', screen: 'MealsDashboard', color: Colors.chartMeal },
+            { icon: 'medical-outline', label: 'Insulin', screen: 'InsulinDashboard', color: Colors.chartInsulin },
+            { icon: 'walk-outline', label: 'Activities', screen: 'ActivitiesDashboard', color: Colors.chartActivity },
           ].map((item) => (
             <TouchableOpacity
               key={item.screen}
               style={styles.quickLogBtn}
-              onPress={() => navigation.navigate('Log', { screen: item.screen })}
+              onPress={() => navigation.navigate(item.screen)}
               activeOpacity={0.8}
             >
               <Ionicons name={item.icon as any} size={28} color={item.color} style={styles.quickLogIcon} />
