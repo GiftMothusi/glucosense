@@ -11,7 +11,7 @@ from app.schemas.schemas import ActivityCreate, ActivityResponse
 router = APIRouter(prefix="/activities", tags=["Activities"])
 
 
-@router.post("/", response_model=ActivityResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ActivityResponse, status_code=status.HTTP_201_CREATED)
 async def log_activity(
     data: ActivityCreate,
     current_user=Depends(get_current_user),
@@ -29,7 +29,7 @@ async def log_activity(
     return activity
 
 
-@router.get("/", response_model=List[ActivityResponse])
+@router.get("", response_model=List[ActivityResponse])
 async def list_activities(
     days: int = Query(default=7, ge=1, le=90),
     current_user=Depends(get_current_user),

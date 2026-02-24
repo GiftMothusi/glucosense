@@ -5,12 +5,13 @@ import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button } from '../../components/common';
 import { userApi } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
+import { Icon, IconName } from '../../components/Icon';
 
-const DIABETES_TYPES = [
-  { key: 'type_1', label: 'Type 1', emoji: '🩺' },
-  { key: 'type_2', label: 'Type 2', emoji: '💊' },
-  { key: 'gestational', label: 'Gestational', emoji: '🤰' },
-  { key: 'prediabetes', label: 'Prediabetes', emoji: '⚠️' },
+const DIABETES_TYPES: Array<{ key: string; label: string; icon: IconName }> = [
+  { key: 'type_1', label: 'Type 1', icon: 'diabetes' },
+  { key: 'type_2', label: 'Type 2', icon: 'medication' },
+  { key: 'gestational', label: 'Gestational', icon: 'person' },
+  { key: 'prediabetes', label: 'Prediabetes', icon: 'flag' },
 ];
 
 export default function OnboardingScreen() {
@@ -74,7 +75,7 @@ export default function OnboardingScreen() {
                 style={[styles.option, diabetesType === t.key && styles.optionSelected]}
                 onPress={() => setDiabetesType(t.key)}
               >
-                <Text style={styles.optionEmoji}>{t.emoji}</Text>
+                <Icon name={t.icon} size={24} color={diabetesType === t.key ? Colors.accent : Colors.textMuted} />
                 <Text style={[styles.optionLabel, diabetesType === t.key && styles.optionLabelSelected]}>
                   {t.label}
                 </Text>
@@ -116,13 +117,13 @@ export default function OnboardingScreen() {
 
         {step === 2 && (
           <View style={styles.optionGrid}>
-            {[{ key: true, label: 'Yes, I use a CGM', emoji: '📡' }, { key: false, label: 'No, I use a finger prick meter', emoji: '🩸' }].map((o) => (
+            {[{ key: true, label: 'Yes, I use a CGM', icon: 'chart' as const }, { key: false, label: 'No, I use a finger prick meter', icon: 'glucose' as const }].map((o) => (
               <TouchableOpacity
                 key={String(o.key)}
                 style={[styles.option, usesCGM === o.key && styles.optionSelected, { width: '100%' }]}
                 onPress={() => setUsesCGM(o.key)}
               >
-                <Text style={styles.optionEmoji}>{o.emoji}</Text>
+                <Icon name={o.icon} size={24} color={usesCGM === o.key ? Colors.accent : Colors.textMuted} />
                 <Text style={[styles.optionLabel, usesCGM === o.key && styles.optionLabelSelected]}>{o.label}</Text>
               </TouchableOpacity>
             ))}
@@ -140,7 +141,7 @@ export default function OnboardingScreen() {
           />
         ) : (
           <Button
-            label="Get Started 🎉"
+            label="Get Started"
             onPress={handleComplete}
             loading={isLoading}
             fullWidth size="lg"

@@ -2,7 +2,8 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, desc, func
+from sqlalchemy import select, and_, desc
+from sqlalchemy.orm import selectinload
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models import Meal, MealItem
@@ -11,7 +12,7 @@ from app.schemas.schemas import MealCreate, MealResponse
 router = APIRouter(prefix="/meals", tags=["Meals"])
 
 
-@router.post("/", response_model=MealResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=MealResponse, status_code=status.HTTP_201_CREATED)
 async def log_meal(
     data: MealCreate,
     current_user=Depends(get_current_user),
@@ -57,11 +58,16 @@ async def log_meal(
         db.add(item)
 
     await db.commit()
-    await db.refresh(meal)
-    return meal
+
+    result = await db.execute(
+        select(Meal)
+        .options(selectinload(Meal.items))
+        .where(Meal.id == meal.id)
+    )
+    return result.scalar_one()
 
 
-@router.get("/", response_model=List[MealResponse])
+@router.get("", response_model=List[MealResponse])
 async def list_meals(
     days: int = Query(default=7, ge=1, le=365),
     current_user=Depends(get_current_user),
@@ -70,6 +76,7 @@ async def list_meals(
     since = datetime.now(timezone.utc) - timedelta(days=days)
     result = await db.execute(
         select(Meal)
+        .options(selectinload(Meal.items))
         .where(and_(Meal.user_id == current_user.id, Meal.eaten_at >= since))
         .order_by(desc(Meal.eaten_at))
     )
@@ -83,6 +90,7 @@ async def favourite_meals(
 ):
     result = await db.execute(
         select(Meal)
+        .options(selectinload(Meal.items))
         .where(and_(Meal.user_id == current_user.id, Meal.is_favourite == True))
         .order_by(desc(Meal.eaten_at))
         .limit(50)

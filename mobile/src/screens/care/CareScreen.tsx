@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Card, SectionHeader, Button, EmptyState } from '../../components/common';
 import { careApi } from '../../services/api';
+import { Icon } from '../../components/Icon';
 
 export default function CareScreen() {
   const [medications, setMedications] = useState<any[]>([]);
@@ -35,24 +36,27 @@ export default function CareScreen() {
         <SectionHeader title="Medications" rightAction={{ label: '+ Add', onPress: () => Alert.alert('Add Medication', 'Full form coming soon') }} />
         {medications.length > 0 ? medications.map((m) => (
           <Card key={m.id} style={styles.item}>
-            <Text style={styles.itemTitle}>💊 {m.name}</Text>
+            <Icon name="medication" size={16} color={Colors.textPrimary} style={{ marginRight: 8 }} />
+            <Text style={styles.itemTitle}>{m.name}</Text>
             <Text style={styles.itemSub}>{m.dose} · {m.frequency}</Text>
           </Card>
-        )) : <EmptyState emoji="💊" title="No medications" subtitle="Add your medications to track adherence" />}
+        )) : <EmptyState icon="medication" title="No medications" subtitle="Add your medications to track adherence" />}
 
         <SectionHeader title="Emergency Contacts" rightAction={{ label: '+ Add', onPress: () => Alert.alert('Add Contact', 'Full form coming soon') }} style={{ marginTop: Spacing.lg }} />
         {contacts.length > 0 ? contacts.map((c) => (
           <Card key={c.id} style={styles.item}>
-            <Text style={styles.itemTitle}>👤 {c.name}</Text>
+            <Icon name="person" size={16} color={Colors.textPrimary} style={{ marginRight: 8 }} />
+            <Text style={styles.itemTitle}>{c.name}</Text>
             {c.phone && <Text style={styles.itemSub}>{c.phone} · {c.relationship}</Text>}
           </Card>
-        )) : <EmptyState emoji="📞" title="No emergency contacts" subtitle="Add contacts to notify in case of severe hypos" />}
+        )) : <EmptyState icon="contact" title="No emergency contacts" subtitle="Add contacts to notify in case of severe hypos" />}
 
         <SectionHeader title="Supplies" rightAction={{ label: '+ Add', onPress: () => Alert.alert('Add Supply', 'Full form coming soon') }} style={{ marginTop: Spacing.lg }} />
         {supplies.length > 0 ? supplies.map((s) => (
           <Card key={s.id} style={styles.item}>
             <View style={styles.supplyRow}>
-              <Text style={styles.itemTitle}>📦 {s.name}</Text>
+              <Icon name="supplies" size={16} color={Colors.textPrimary} style={{ marginRight: 8 }} />
+              <Text style={styles.itemTitle}>{s.name}</Text>
               <Text style={styles.supplyQty}>{s.quantity} {s.unit}</Text>
             </View>
             {s.estimated_depletion_date && (
@@ -61,7 +65,7 @@ export default function CareScreen() {
               </Text>
             )}
           </Card>
-        )) : <EmptyState emoji="📦" title="No supplies tracked" subtitle="Track test strips, sensors, and insulin supplies" />}
+        )) : <EmptyState icon="supplies" title="No supplies tracked" subtitle="Track test strips, sensors, and insulin supplies" />}
       </ScrollView>
     </SafeAreaView>
   );

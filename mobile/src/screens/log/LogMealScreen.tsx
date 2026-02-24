@@ -5,12 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { mealApi } from '../../services/api';
+import { Icon, IconName } from '../../components/Icon';
 
-const MEAL_TYPES = [
-  { key: 'breakfast', label: 'Breakfast', emoji: '🌅' },
-  { key: 'lunch', label: 'Lunch', emoji: '☀️' },
-  { key: 'dinner', label: 'Dinner', emoji: '🌙' },
-  { key: 'snack', label: 'Snack', emoji: '🍎' },
+const MEAL_TYPES: Array<{ key: string; label: string; icon: IconName }> = [
+  { key: 'breakfast', label: 'Breakfast', icon: 'fasting' },
+  { key: 'lunch', label: 'Lunch', icon: 'meal' },
+  { key: 'dinner', label: 'Dinner', icon: 'bedtime' },
+  { key: 'snack', label: 'Snack', icon: 'meal' },
 ];
 
 export default function LogMealScreen() {
@@ -25,10 +26,10 @@ export default function LogMealScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLog = async () => {
-    if (!mealName || !mealType) return;
+    if (!mealName || !mealType || isLoading) return;
     setIsLoading(true);
     try {
-      await mealApi.log({
+      const response = await mealApi.log({
         name: mealName.trim(),
         meal_type: mealType,
         notes: notes.trim() || undefined,
@@ -41,8 +42,12 @@ export default function LogMealScreen() {
           calories: parseFloat(calories) || 0,
         }] : [],
       });
+      console.log('Meal logged successfully:', JSON.stringify(response.data));
+
+      setIsLoading(false);
       navigation.goBack();
-    } catch {
+    } catch (error: any) {
+      console.log('Meal log error:', JSON.stringify(error?.response?.data), 'Status:', error?.response?.status);
       setIsLoading(false);
     }
   };
@@ -58,7 +63,7 @@ export default function LogMealScreen() {
             <View style={styles.typeGrid}>
               {MEAL_TYPES.map((t) => (
                 <TouchableOpacity key={t.key} style={[styles.typeBtn, mealType === t.key && styles.typeBtnActive]} onPress={() => setMealType(t.key)}>
-                  <Text style={styles.typeEmoji}>{t.emoji}</Text>
+                  <Icon name={t.icon} size={20} color={mealType === t.key ? Colors.accent : Colors.textMuted} />
                   <Text style={[styles.typeLabel, mealType === t.key && styles.typeLabelActive]}>{t.label}</Text>
                 </TouchableOpacity>
               ))}

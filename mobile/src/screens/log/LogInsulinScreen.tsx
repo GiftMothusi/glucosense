@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { insulinApi } from '../../services/api';
+import { Icon } from '../../components/Icon';
 
 const INSULIN_TYPES = [
   { key: 'rapid', label: 'Rapid', sub: 'Novorapid, Humalog' },
@@ -55,7 +56,7 @@ export default function LogInsulinScreen() {
                     <Text style={[styles.typeLabel, insulinType === t.key && styles.typeLabelActive]}>{t.label}</Text>
                     <Text style={styles.typeSub}>{t.sub}</Text>
                   </View>
-                  {insulinType === t.key && <Text style={{ color: Colors.accent, fontSize: 20 }}>✓</Text>}
+                  {insulinType === t.key && <Icon name="check" size={20} color={Colors.accent} />}
                 </TouchableOpacity>
               ))}
             </View>
@@ -80,7 +81,10 @@ export default function LogInsulinScreen() {
           <View style={styles.checkRow}>
             {[{ label: 'Correction dose', state: isCorrection, set: setIsCorrection }, { label: 'Basal dose', state: isBasal, set: setIsBasal }].map((c) => (
               <TouchableOpacity key={c.label} style={[styles.check, c.state && styles.checkActive]} onPress={() => c.set(!c.state)}>
-                <Text style={[styles.checkText, c.state && styles.checkTextActive]}>{c.state ? '✓ ' : ''}{c.label}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {c.state && <Icon name="check" size={16} color={Colors.accent} style={{ marginRight: 4 }} />}
+                  <Text style={[styles.checkText, c.state && styles.checkTextActive]}>{c.label}</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>

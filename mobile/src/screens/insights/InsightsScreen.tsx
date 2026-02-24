@@ -7,6 +7,7 @@ import { TIRRing } from '../../components/charts/TIRRing';
 import { analyticsApi } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useGlucoseStore } from '../../store/glucoseStore';
+import { Icon } from '../../components/Icon';
 
 export default function InsightsScreen() {
   const { user } = useAuthStore();
@@ -84,7 +85,7 @@ export default function InsightsScreen() {
             </View>
           </Card>
         ) : (
-          <EmptyState emoji="📊" title="Not enough data" subtitle="Log a few glucose readings to see your stats." />
+          <EmptyState icon="chart" title="Not enough data" subtitle="Log a few glucose readings to see your stats." />
         )}
 
         {user?.is_premium ? (
@@ -104,12 +105,12 @@ export default function InsightsScreen() {
                 </Card>
               ))
             ) : (
-              <EmptyState emoji="🔍" title="No patterns yet" subtitle="Keep logging for 2+ weeks to unlock pattern detection." />
+              <EmptyState icon="search" title="No patterns yet" subtitle="Keep logging for 2+ weeks to unlock pattern detection." />
             )}
           </>
         ) : (
           <Card style={styles.premiumBanner}>
-            <Text style={styles.premiumEmoji}>✨</Text>
+            <Icon name="sparkles" size={40} color={Colors.accent} />
             <Text style={styles.premiumTitle}>Unlock AI Insights</Text>
             <Text style={styles.premiumSub}>Upgrade to Premium to see pattern detection, predictions, meal impact scores, and weekly reports.</Text>
           </Card>

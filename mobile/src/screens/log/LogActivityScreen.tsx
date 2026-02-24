@@ -5,16 +5,17 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { activityApi } from '../../services/api';
+import { Icon } from '../../components/Icon';
 
 const ACTIVITY_TYPES = [
-  { key: 'walking', emoji: '🚶', label: 'Walking' },
-  { key: 'running', emoji: '🏃', label: 'Running' },
-  { key: 'cycling', emoji: '🚴', label: 'Cycling' },
-  { key: 'swimming', emoji: '🏊', label: 'Swimming' },
-  { key: 'gym', emoji: '🏋️', label: 'Gym' },
-  { key: 'yoga', emoji: '🧘', label: 'Yoga' },
-  { key: 'sport', emoji: '⚽', label: 'Sport' },
-  { key: 'other', emoji: '🏅', label: 'Other' },
+  { key: 'walking', label: 'Walking' },
+  { key: 'running', label: 'Running' },
+  { key: 'cycling', label: 'Cycling' },
+  { key: 'swimming', label: 'Swimming' },
+  { key: 'gym', label: 'Gym' },
+  { key: 'yoga', label: 'Yoga' },
+  { key: 'sport', label: 'Sport' },
+  { key: 'other', label: 'Other' },
 ];
 
 const INTENSITIES = ['low', 'moderate', 'high'];
@@ -53,7 +54,7 @@ export default function LogActivityScreen() {
           <View style={styles.activityGrid}>
             {ACTIVITY_TYPES.map((a) => (
               <TouchableOpacity key={a.key} style={[styles.activityBtn, activityType === a.key && styles.activityBtnActive]} onPress={() => setActivityType(a.key)}>
-                <Text style={styles.activityEmoji}>{a.emoji}</Text>
+                <Icon name="activity" size={20} color={activityType === a.key ? Colors.accent : Colors.textMuted} />
                 <Text style={[styles.activityLabel, activityType === a.key && styles.activityLabelActive]}>{a.label}</Text>
               </TouchableOpacity>
             ))}

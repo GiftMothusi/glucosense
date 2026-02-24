@@ -13,7 +13,7 @@ from app.schemas.schemas import (
 router = APIRouter(prefix="/glucose", tags=["Glucose"])
 
 
-@router.post("/", response_model=GlucoseReadingResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=GlucoseReadingResponse, status_code=status.HTTP_201_CREATED)
 async def log_glucose(
     data: GlucoseReadingCreate,
     current_user=Depends(get_current_user),
@@ -23,7 +23,7 @@ async def log_glucose(
     return reading
 
 
-@router.get("/", response_model=GlucoseListResponse)
+@router.get("", response_model=GlucoseListResponse)
 async def list_glucose(
     days: int = Query(default=14, ge=1, le=365),
     page: int = Query(default=1, ge=1),

@@ -5,7 +5,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { useGlucoseStore } from '../../store/glucoseStore';
 import { useAuthStore } from '../../store/authStore';
@@ -13,6 +12,8 @@ import { Card, SectionHeader, Pill } from '../../components/common';
 import { TIRRing, Sparkline } from '../../components/charts/TIRRing';
 import { getGlucoseColor, getGlucoseLabel } from '../../theme/theme';
 import { format, formatDistanceToNow } from 'date-fns';
+import { Icon } from '../../components/Icon';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DashboardScreen() {
   const navigation = useNavigation<any>();
@@ -64,7 +65,10 @@ export default function DashboardScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>{greeting},</Text>
-            <Text style={styles.name}>{firstName} 👋</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.name}>{firstName}</Text>
+              <Icon name="wave" size={20} color={Colors.textPrimary} style={{ marginLeft: 4 }} />
+            </View>
           </View>
           <TouchableOpacity
             style={styles.addBtn}
@@ -167,7 +171,7 @@ export default function DashboardScreen() {
         {!user?.is_premium && (
           <Card style={styles.premiumCard} onPress={() => navigation.navigate('Profile')}>
             <View style={styles.premiumContent}>
-              <Text style={styles.premiumEmoji}>✨</Text>
+              <Icon name="sparkles" size={24} color={Colors.accent} />
               <View style={styles.premiumText}>
                 <Text style={styles.premiumTitle}>Unlock AI Insights</Text>
                 <Text style={styles.premiumSub}>Pattern detection, predictions, weekly reports & more</Text>

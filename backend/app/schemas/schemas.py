@@ -455,4 +455,53 @@ class SupplyItemResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class LabResultCreate(BaseModel):
+    test_name: str = Field(min_length=1, max_length=255)
+    value: float
+    unit: str = Field(min_length=1, max_length=50)
+    reference_low: Optional[float] = None
+    reference_high: Optional[float] = None
+    lab_name: Optional[str] = None
+    tested_at: datetime
+
+
+class LabResultResponse(BaseModel):
+    id: int
+    test_name: str
+    value: float
+    unit: str
+    reference_low: Optional[float]
+    reference_high: Optional[float]
+    lab_name: Optional[str]
+    tested_at: datetime
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class AppointmentCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=255)
+    provider_name: Optional[str] = None
+    location: Optional[str] = None
+    appointment_type: Optional[str] = None
+    notes: Optional[str] = None
+    reminder_minutes: int = Field(default=60, ge=0, le=10080)
+    scheduled_at: datetime
+
+
+class AppointmentResponse(BaseModel):
+    id: int
+    title: str
+    provider_name: Optional[str]
+    location: Optional[str]
+    appointment_type: Optional[str]
+    notes: Optional[str]
+    reminder_minutes: int
+    is_completed: bool
+    scheduled_at: datetime
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 UserDetailResponse.model_rebuild()

@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input } from '../../components/common';
 import { useAuthStore } from '../../store/authStore';
+import { Icon } from '@components/Icon';
 
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
@@ -50,7 +51,7 @@ export default function LoginScreen() {
               <View style={styles.errorBanner}>
                 <Text style={styles.errorText}>{error}</Text>
                 <TouchableOpacity onPress={clearError}>
-                  <Text style={styles.errorDismiss}>✕</Text>
+                  <Icon name="close" size={16} color={Colors.textMuted} />
                 </TouchableOpacity>
               </View>
             )}
@@ -72,7 +73,7 @@ export default function LoginScreen() {
               secureTextEntry={!showPassword}
               rightElement={
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Text style={styles.showHide}>{showPassword ? '🙈' : '👁️'}</Text>
+                  <Icon name={showPassword ? 'eye-off' : 'eye'} size={20} color={Colors.textMuted} />
                 </TouchableOpacity>
               }
             />

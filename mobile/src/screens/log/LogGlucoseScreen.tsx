@@ -5,14 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Typography, BorderRadius, getGlucoseColor, getGlucoseLabel } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { useGlucoseStore } from '../../store/glucoseStore';
+import { Icon, IconName } from '../../components/Icon';
 
-const TAGS = [
-  { key: 'fasting', label: 'Fasting', emoji: '🌙' },
-  { key: 'pre_meal', label: 'Pre-meal', emoji: '🍽️' },
-  { key: 'post_meal', label: 'Post-meal', emoji: '✅' },
-  { key: 'bedtime', label: 'Bedtime', emoji: '😴' },
-  { key: 'exercise', label: 'Exercise', emoji: '🏃' },
-  { key: 'sick', label: 'Sick', emoji: '🤒' },
+const TAGS: Array<{ key: string; label: string; icon: IconName }> = [
+  { key: 'fasting', label: 'Fasting', icon: 'fasting' },
+  { key: 'pre_meal', label: 'Pre-meal', icon: 'meal' },
+  { key: 'post_meal', label: 'Post-meal', icon: 'check' },
+  { key: 'bedtime', label: 'Bedtime', icon: 'bedtime' },
+  { key: 'exercise', label: 'Exercise', icon: 'activity' },
+  { key: 'sick', label: 'Sick', icon: 'sick' },
 ];
 
 export default function LogGlucoseScreen() {
@@ -58,7 +59,7 @@ export default function LogGlucoseScreen() {
             <View style={styles.tagGrid}>
               {TAGS.map((tag) => (
                 <TouchableOpacity key={tag.key} style={[styles.tag, selectedTag === tag.key && styles.tagSelected]} onPress={() => setSelectedTag(selectedTag === tag.key ? null : tag.key)}>
-                  <Text style={styles.tagEmoji}>{tag.emoji}</Text>
+                  <Icon name={tag.icon} size={16} color={selectedTag === tag.key ? Colors.accent : Colors.textMuted} />
                   <Text style={[styles.tagLabel, selectedTag === tag.key && styles.tagLabelSelected]}>{tag.label}</Text>
                 </TouchableOpacity>
               ))}

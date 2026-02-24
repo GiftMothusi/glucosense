@@ -215,16 +215,19 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, rightAction
   </View>
 );
 
+import { Icon, IconName } from '../Icon';
+
 interface EmptyStateProps {
-  emoji: string;
+  icon?: IconName;
+  emoji?: string;
   title: string;
   subtitle?: string;
   action?: { label: string; onPress: () => void };
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ emoji, title, subtitle, action }) => (
+export const EmptyState: React.FC<EmptyStateProps> = ({ icon, emoji, title, subtitle, action }) => (
   <View style={styles.emptyState}>
-    <Text style={styles.emptyEmoji}>{emoji}</Text>
+    {icon ? <Icon name={icon} size={48} color={Colors.textMuted} /> : <Text style={styles.emptyEmoji}>{emoji}</Text>}
     <Text style={styles.emptyTitle}>{title}</Text>
     {subtitle && <Text style={styles.emptySubtitle}>{subtitle}</Text>}
     {action && (

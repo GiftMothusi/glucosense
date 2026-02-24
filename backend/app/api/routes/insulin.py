@@ -14,7 +14,7 @@ from app.schemas.schemas import (
 router = APIRouter(prefix="/insulin", tags=["Insulin"])
 
 
-@router.post("/", response_model=InsulinDoseResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=InsulinDoseResponse, status_code=status.HTTP_201_CREATED)
 async def log_insulin(
     data: InsulinDoseCreate,
     current_user=Depends(get_current_user),
@@ -32,7 +32,7 @@ async def log_insulin(
     return dose
 
 
-@router.get("/", response_model=List[InsulinDoseResponse])
+@router.get("", response_model=List[InsulinDoseResponse])
 async def list_insulin(
     days: int = Query(default=7, ge=1, le=90),
     current_user=Depends(get_current_user),
