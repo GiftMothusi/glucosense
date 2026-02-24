@@ -11,13 +11,19 @@ const storage = {
 };
 
 const BASE_URL = __DEV__
-  ? 'http://192.168.0.151:8000/api/v1'
+  ? 'http://10.60.26.83:8000/api/v1'  // Your actual laptop IP
   : 'https://api.glucosense.health/api/v1';
 
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
+});
+
+// Add request logging for debugging
+api.interceptors.request.use(async (config) => {
+  console.log('API Request:', config.method?.toUpperCase(), config.url, 'Base URL:', BASE_URL);
+  return config;
 });
 
 // ─── Request interceptor — attach token ───────────────────────────────────────

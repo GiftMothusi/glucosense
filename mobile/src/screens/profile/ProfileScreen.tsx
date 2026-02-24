@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { Card, Button } from '../../components/common';
 import { useAuthStore } from '../../store/authStore';
@@ -9,13 +10,13 @@ export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
 
   const MENU_ITEMS = [
-    { emoji: '👤', label: 'Personal Info', onPress: () => Alert.alert('Personal Info', 'Coming soon') },
-    { emoji: '🩺', label: 'Diabetes Profile', onPress: () => Alert.alert('Diabetes Profile', 'Coming soon') },
-    { emoji: '🎯', label: 'Glucose Targets', onPress: () => Alert.alert('Targets', 'Coming soon') },
-    { emoji: '🔔', label: 'Notifications', onPress: () => Alert.alert('Notifications', 'Coming soon') },
-    { emoji: '🔒', label: 'Privacy & Security', onPress: () => Alert.alert('Privacy', 'Coming soon') },
-    { emoji: '📤', label: 'Export Data', onPress: () => Alert.alert('Export', 'Coming soon') },
-    { emoji: '❓', label: 'Help & Support', onPress: () => Alert.alert('Help', 'Coming soon') },
+    { icon: 'person-outline', label: 'Personal Info', onPress: () => Alert.alert('Personal Info', 'Coming soon') },
+    { icon: 'medkit-outline', label: 'Diabetes Profile', onPress: () => Alert.alert('Diabetes Profile', 'Coming soon') },
+    { icon: 'target-outline', label: 'Glucose Targets', onPress: () => Alert.alert('Targets', 'Coming soon') },
+    { icon: 'notifications-outline', label: 'Notifications', onPress: () => Alert.alert('Notifications', 'Coming soon') },
+    { icon: 'lock-closed-outline', label: 'Privacy & Security', onPress: () => Alert.alert('Privacy', 'Coming soon') },
+    { icon: 'download-outline', label: 'Export Data', onPress: () => Alert.alert('Export', 'Coming soon') },
+    { icon: 'help-circle-outline', label: 'Help & Support', onPress: () => Alert.alert('Help', 'Coming soon') },
   ];
 
   return (
@@ -38,7 +39,7 @@ export default function ProfileScreen() {
         {/* Subscription banner */}
         {!user?.is_premium ? (
           <Card style={styles.premiumCard} onPress={() => Alert.alert('Upgrade', 'Payment flow coming soon')}>
-            <Text style={styles.premiumEmoji}>✨</Text>
+            <Ionicons name="star-outline" size={24} color={Colors.accent} />
             <View style={{ flex: 1 }}>
               <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
               <Text style={styles.premiumSub}>$7.99/month · AI insights, CGM sync, doctor reports</Text>
@@ -46,8 +47,8 @@ export default function ProfileScreen() {
             <Text style={{ color: Colors.accent, fontSize: 20 }}>›</Text>
           </Card>
         ) : (
-          <Card style={[styles.premiumCard, styles.premiumActive]}>
-            <Text style={styles.premiumEmoji}>⭐</Text>
+          <Card style={Object.assign({}, styles.premiumCard, styles.premiumActive)}>
+            <Ionicons name="star" size={24} color={Colors.accent} />
             <Text style={styles.premiumTitle}>Premium Active</Text>
           </Card>
         )}
@@ -57,7 +58,7 @@ export default function ProfileScreen() {
           {MENU_ITEMS.map((item, i) => (
             <React.Fragment key={item.label}>
               <TouchableOpacity style={styles.menuItem} onPress={item.onPress} activeOpacity={0.7}>
-                <Text style={styles.menuEmoji}>{item.emoji}</Text>
+                <Ionicons name={item.icon as any} size={20} color={Colors.textSecondary} style={styles.menuIcon} />
                 <Text style={styles.menuLabel}>{item.label}</Text>
                 <Text style={styles.menuArrow}>›</Text>
               </TouchableOpacity>
@@ -94,12 +95,11 @@ const styles = StyleSheet.create({
   diabetesType: { color: Colors.accent, fontSize: Typography.size.sm, fontWeight: '700', backgroundColor: Colors.accentAlpha10, paddingHorizontal: Spacing.md, paddingVertical: 4, borderRadius: BorderRadius.full },
   premiumCard: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, borderWidth: 1, borderColor: Colors.accent + '40', backgroundColor: Colors.primaryLight },
   premiumActive: { backgroundColor: Colors.accentAlpha10, borderColor: Colors.accent },
-  premiumEmoji: { fontSize: 24 },
   premiumTitle: { color: Colors.textPrimary, fontWeight: '700', fontSize: Typography.size.base },
   premiumSub: { color: Colors.textSecondary, fontSize: Typography.size.xs },
   menuCard: { padding: 0, overflow: 'hidden' },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, padding: Spacing.base },
-  menuEmoji: { fontSize: 20, width: 28 },
+  menuIcon: { width: 28 },
   menuLabel: { flex: 1, color: Colors.textPrimary, fontSize: Typography.size.base, fontWeight: '500' },
   menuArrow: { color: Colors.textMuted, fontSize: 20 },
   menuDivider: { height: 1, backgroundColor: Colors.surfaceBorder, marginLeft: 60 },

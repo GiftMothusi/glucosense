@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { useGlucoseStore } from '../../store/glucoseStore';
 import { useAuthStore } from '../../store/authStore';
@@ -146,10 +147,10 @@ export default function DashboardScreen() {
         <SectionHeader title="Quick Log" style={{ marginTop: Spacing.lg }} />
         <View style={styles.quickLogRow}>
           {[
-            { emoji: '🩸', label: 'Glucose', screen: 'LogGlucose' },
-            { emoji: '🍽️', label: 'Meal', screen: 'LogMeal' },
-            { emoji: '💉', label: 'Insulin', screen: 'LogInsulin' },
-            { emoji: '🏃', label: 'Activity', screen: 'LogActivity' },
+            { icon: 'water-outline', label: 'Glucose', screen: 'LogGlucose', color: Colors.inRange },
+            { icon: 'restaurant-outline', label: 'Meal', screen: 'LogMeal', color: Colors.chartMeal },
+            { icon: 'medical-outline', label: 'Insulin', screen: 'LogInsulin', color: Colors.chartInsulin },
+            { icon: 'walk-outline', label: 'Activity', screen: 'LogActivity', color: Colors.chartActivity },
           ].map((item) => (
             <TouchableOpacity
               key={item.screen}
@@ -157,7 +158,7 @@ export default function DashboardScreen() {
               onPress={() => navigation.navigate('Log', { screen: item.screen })}
               activeOpacity={0.8}
             >
-              <Text style={styles.quickLogEmoji}>{item.emoji}</Text>
+              <Ionicons name={item.icon as any} size={28} color={item.color} style={styles.quickLogIcon} />
               <Text style={styles.quickLogLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     gap: 4,
     ...Shadows.sm,
   },
-  quickLogEmoji: { fontSize: 24 },
+  quickLogIcon: { marginBottom: 4 },
   quickLogLabel: { color: Colors.textSecondary, fontSize: Typography.size.xs, fontWeight: '600' },
 
   premiumCard: {

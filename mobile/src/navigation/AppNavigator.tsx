@@ -3,18 +3,35 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Shadows } from '../theme/theme';
 import { useAuthStore } from '../store/authStore';
 import { getAccessToken } from '../services/api';
 
-const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => (
-  <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
-    {name === 'Dashboard' ? '🏠' :
-     name === 'Log' ? '➕' :
-     name === 'Insights' ? '📊' :
-     name === 'Care' ? '🩺' : '👤'}
-  </Text>
-);
+const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
+  let iconName: keyof typeof Ionicons.glyphMap;
+  
+  switch (name) {
+    case 'Dashboard':
+      iconName = 'home-outline';
+      break;
+    case 'Log':
+      iconName = 'add-circle-outline';
+      break;
+    case 'Insights':
+      iconName = 'bar-chart-outline';
+      break;
+    case 'Care':
+      iconName = 'medkit-outline';
+      break;
+    case 'Profile':
+    default:
+      iconName = 'person-outline';
+      break;
+  }
+  
+  return <Ionicons name={iconName} size={24} color={focused ? Colors.primary : Colors.textMuted} />;
+};
 
 const LoginScreen = React.lazy(() => import('../screens/auth/LoginScreen'));
 const RegisterScreen = React.lazy(() => import('../screens/auth/RegisterScreen'));
