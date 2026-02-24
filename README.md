@@ -21,57 +21,75 @@ A production-grade, full-stack diabetes management application built with React 
 ## Local Development Setup
 
 ### Prerequisites
-- Python 3.12+
+- Python 3.13 (works with 3.12+)
 - Node.js 20+
 - Docker + Docker Compose
-- Expo CLI: `npm install -g expo-cli`
+- Expo Go app on your phone
 
----
+### 1. Start Infrastructure (Database + Redis)
 
-### 1. Clone and set up the backend
+```bash
+cd infra
+cp .env.example .env
+# Edit .env with PostgreSQL password (default: postgres123)
+
+docker compose up postgres redis -d
+```
+
+### 2. Backend Setup
 
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your secrets
+# Edit .env - update DATABASE_URL to match infra/.env password
 
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
 
-### 2. Start infrastructure (database + redis)
+# Install core packages first
+pip install fastapi uvicorn sqlalchemy alembic asyncpg psycopg2-binary pydantic python-jose passlib bcrypt python-multipart celery redis boto3 sentry-sdk slowapi email-validator pytz aiofiles websockets pytest pytest-asyncio faker python-dotenv httpx
 
-```bash
-cd infra
-docker-compose up postgres redis -d
-```
+# Install data science packages (Python 3.13 compatible versions)
+pip install --only-binary=:all: pandas scipy scikit-learn prophet reportlab pillow numpy
 
-### 3. Run migrations
+# Handle database migrations
+alembic stamp head  # Skip problematic migration for now
+# alembic upgrade head  # Use this when migrations are fixed
 
-```bash
-cd backend
-alembic upgrade head
-```
-
-### 4. Start the API
-
-```bash
-cd backend
+# Start the API
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 API docs available at: http://localhost:8000/docs
 
-### 5. Start the mobile app
+### 3. Mobile App Setup
 
 ```bash
 cd mobile
-npm install
+npm install --legacy-peer-deps
 npx expo start
 ```
 
-Press `a` for Android emulator, `i` for iOS simulator, or scan the QR code with Expo Go.
+**Mobile Connection Issues?**
+- If QR code doesn't work: In Expo Go app, tap "Enter URL manually" and type the LAN URL shown in terminal
+- Make sure phone and laptop are on same WiFi
+- Try `npx expo start --tunnel` if LAN doesn't work (requires ngrok installation)
+- For testing: `npx expo start --web` opens in browser
+
+### Troubleshooting Common Issues
+
+**Python package installation fails:**
+- Use `pip install --only-binary=:all: <package>` for precompiled wheels
+- Python 3.13 may have compilation issues with some packages
+
+**Migration errors:**
+- Use `alembic stamp head` to mark database as current
+- Or reset database: `docker compose down postgres && docker volume rm infra_postgres_data && docker compose up postgres -d`
+
+**Mobile connection issues:**
+- Check phone/laptop are on same WiFi
+- Use manual URL entry in Expo Go
+- Try tunnel mode: `npx expo start --tunnel`
 
 ---
 
