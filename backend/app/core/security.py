@@ -1,14 +1,13 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Union
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
 bearer_scheme = HTTPBearer()
 
 
@@ -17,7 +16,9 @@ def hash_password(password: str) -> str:
     password_bytes = password.encode('utf-8')
     if len(password_bytes) > 72:
         password_bytes = password_bytes[:72]
-    return pwd_context.hash(password_bytes.decode('utf-8'))
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -25,7 +26,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     password_bytes = plain_password.encode('utf-8')
     if len(password_bytes) > 72:
         password_bytes = password_bytes[:72]
-    return pwd_context.verify(password_bytes.decode('utf-8'), hashed_password)
+    hashed_bytes = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
