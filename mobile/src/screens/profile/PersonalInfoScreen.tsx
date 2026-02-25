@@ -35,10 +35,12 @@ function parseDobFromProfile(dateStr: string | null | undefined): { month: strin
   if (!dateStr) return { month: '', day: '', year: '' };
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return { month: '', day: '', year: '' };
+  
+  // Use UTC methods to avoid timezone issues
   return {
-    month: MONTHS[d.getMonth()],
-    day: String(d.getDate()),
-    year: String(d.getFullYear()),
+    month: MONTHS[d.getUTCMonth()],
+    day: String(d.getUTCDate()),
+    year: String(d.getUTCFullYear()),
   };
 }
 
@@ -88,10 +90,9 @@ export default function PersonalInfoScreen() {
   const [fullName] = useState(user?.full_name ?? '');
   const [email]    = useState(user?.email ?? '');
 
-  const initial = parseDobFromProfile(profile?.date_of_birth);
-  const [dobMonth, setDobMonth] = useState(initial.month);
-  const [dobDay,   setDobDay]   = useState(initial.day);
-  const [dobYear,  setDobYear]  = useState(initial.year);
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobDay,   setDobDay]   = useState('');
+  const [dobYear,  setDobYear]  = useState('');
   const [showMonthPicker, setShowMonthPicker] = useState(false);
 
   const [gender,   setGender]   = useState(profile?.gender ?? '');
@@ -103,6 +104,18 @@ export default function PersonalInfoScreen() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors]       = useState<Record<string, string>>({});
+
+  // Load DOB from profile when component mounts or profile changes
+  React.useEffect(() => {
+    console.log('Profile DOB:', profile?.date_of_birth);
+    if (profile?.date_of_birth) {
+      const parsed = parseDobFromProfile(profile.date_of_birth);
+      console.log('Parsed DOB:', parsed);
+      setDobMonth(parsed.month);
+      setDobDay(parsed.day);
+      setDobYear(parsed.year);
+    }
+  }, [profile?.date_of_birth]);
 
   const validate = () => {
     const e: Record<string, string> = {};

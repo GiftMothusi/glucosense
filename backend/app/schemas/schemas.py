@@ -78,6 +78,8 @@ class UserDetailResponse(UserResponse):
 
 
 class UserProfileResponse(BaseModel):
+    date_of_birth: Optional[datetime]
+    gender: Optional[str]
     glucose_unit: GlucoseUnit
     height_cm: Optional[float]
     weight_kg: Optional[float]
