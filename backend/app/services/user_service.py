@@ -116,6 +116,20 @@ class UserService:
         return dp
 
     @staticmethod
+    async def change_password(
+        db: AsyncSession, user_id: int, current_password: str, new_password: str
+    ) -> bool:
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            return False
+        if not verify_password(current_password, user.hashed_password):
+            return False
+        user.hashed_password = hash_password(new_password)
+        await db.commit()
+        return True
+        
+    @staticmethod
     async def update_last_login(db: AsyncSession, user_id: int):
         result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()

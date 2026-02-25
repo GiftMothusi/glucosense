@@ -6,6 +6,7 @@ from app.services.user_service import UserService
 from app.schemas.schemas import (
     UserDetailResponse, UserProfileUpdate,
     DiabetesProfileCreate, DiabetesProfileResponse,
+     ChangePasswordRequest, ChangePasswordResponse,
 )
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -35,3 +36,20 @@ async def set_diabetes_profile(
 ):
     dp = await UserService.set_diabetes_profile(db, current_user.id, data)
     return dp
+    
+
+@router.post("/me/change-password", response_model=ChangePasswordResponse)
+async def change_password(
+    data: ChangePasswordRequest,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    success = await UserService.change_password(
+        db, current_user.id, data.current_password, data.new_password
+    )
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+    return ChangePasswordResponse(message="Password changed successfully")

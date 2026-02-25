@@ -20,13 +20,11 @@ export const api: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Add request logging for debugging
 api.interceptors.request.use(async (config) => {
   console.log('API Request:', config.method?.toUpperCase(), config.url, 'Base URL:', BASE_URL);
   return config;
 });
 
-// ─── Request interceptor — attach token ───────────────────────────────────────
 api.interceptors.request.use(async (config) => {
   const token = await storage.getString('access_token');
   if (token) {
@@ -35,7 +33,6 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// ─── Response interceptor — auto refresh token ───────────────────────────────
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -47,7 +44,7 @@ api.interceptors.response.use(
       const refreshToken = await storage.getString('refresh_token');
       if (!refreshToken) {
         await storage.clearAll();
-        // Navigate to login — handled by auth store listener
+
         return Promise.reject(error);
       }
 
@@ -69,7 +66,6 @@ api.interceptors.response.use(
   }
 );
 
-// ─── Token helpers ────────────────────────────────────────────────────────────
 export const setTokens = async (accessToken: string, refreshToken: string) => {
   await storage.set('access_token', accessToken);
   await storage.set('refresh_token', refreshToken);
@@ -81,7 +77,6 @@ export const clearTokens = async () => {
 
 export const getAccessToken = async () => await storage.getString('access_token');
 
-// ─── Auth endpoints ───────────────────────────────────────────────────────────
 export const authApi = {
   register: (email: string, password: string, fullName: string) =>
     api.post('/auth/register', { email, password, full_name: fullName }),
@@ -90,7 +85,6 @@ export const authApi = {
   me: () => api.get('/auth/me'),
 };
 
-// ─── Glucose endpoints ────────────────────────────────────────────────────────
 export const glucoseApi = {
   log: (data: any) => api.post('/glucose', data),
   list: (days = 14, page = 1) => api.get('/glucose', { params: { days, page } }),
@@ -102,7 +96,6 @@ export const glucoseApi = {
   delete: (id: number) => api.delete(`/glucose/${id}`),
 };
 
-// ─── Meal endpoints ───────────────────────────────────────────────────────────
 export const mealApi = {
   log: (data: any) => api.post('/meals', data),
   list: (days = 7) => api.get('/meals', { params: { days } }),
@@ -110,7 +103,6 @@ export const mealApi = {
   delete: (id: number) => api.delete(`/meals/${id}`),
 };
 
-// ─── Insulin endpoints ────────────────────────────────────────────────────────
 export const insulinApi = {
   log: (data: any) => api.post('/insulin', data),
   list: (days = 7) => api.get('/insulin', { params: { days } }),
@@ -118,21 +110,18 @@ export const insulinApi = {
   delete: (id: number) => api.delete(`/insulin/${id}`),
 };
 
-// ─── Activity endpoints ───────────────────────────────────────────────────────
 export const activityApi = {
   log: (data: any) => api.post('/activities', data),
   list: (days = 7) => api.get('/activities', { params: { days } }),
   delete: (id: number) => api.delete(`/activities/${id}`),
 };
 
-// ─── Analytics endpoints ──────────────────────────────────────────────────────
 export const analyticsApi = {
   dashboard: () => api.get('/analytics/dashboard'),
   weeklyReport: () => api.get('/analytics/weekly-report'),
   insights: () => api.get('/analytics/insights'),
 };
 
-// ─── Care endpoints ───────────────────────────────────────────────────────────
 export const careApi = {
   getContacts: () => api.get('/care/emergency-contacts'),
   addContact: (data: any) => api.post('/care/emergency-contacts', data),
@@ -147,9 +136,14 @@ export const careApi = {
   addSupply: (data: any) => api.post('/care/supplies', data),
 };
 
-// ─── User endpoints ───────────────────────────────────────────────────────────
 export const userApi = {
   getMe: () => api.get('/users/me'),
   updateProfile: (data: any) => api.patch('/users/me/profile', data),
   setDiabetesProfile: (data: any) => api.post('/users/me/diabetes-profile', data),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post('/users/me/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+
 };
