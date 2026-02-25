@@ -120,6 +120,11 @@ export const analyticsApi = {
   dashboard: () => api.get('/analytics/dashboard'),
   weeklyReport: () => api.get('/analytics/weekly-report'),
   insights: () => api.get('/analytics/insights'),
+  downloadReport: (days: number) =>
+    api.get('/analytics/report', {
+      params: { days },
+      responseType: 'arraybuffer',
+    }),
 };
 
 export const careApi = {
