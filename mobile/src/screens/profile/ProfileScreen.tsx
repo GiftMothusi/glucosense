@@ -2,21 +2,33 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { Card, Button } from '../../components/common';
 import { useAuthStore } from '../../store/authStore';
+import { ProfileStackParamList } from '../../navigation/AppNavigator';
+
+
+type ProfileNavProp = NativeStackNavigationProp<ProfileStackParamList, 'ProfileHome'>;
+
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
+  const navigation = useNavigation<ProfileNavProp>();
 
-  const MENU_ITEMS = [
-    { icon: 'person-outline', label: 'Personal Info', onPress: () => Alert.alert('Personal Info', 'Coming soon') },
-    { icon: 'medkit-outline', label: 'Diabetes Profile', onPress: () => Alert.alert('Diabetes Profile', 'Coming soon') },
-    { icon: 'target-outline', label: 'Glucose Targets', onPress: () => Alert.alert('Targets', 'Coming soon') },
-    { icon: 'notifications-outline', label: 'Notifications', onPress: () => Alert.alert('Notifications', 'Coming soon') },
-    { icon: 'lock-closed-outline', label: 'Privacy & Security', onPress: () => Alert.alert('Privacy', 'Coming soon') },
-    { icon: 'download-outline', label: 'Export Data', onPress: () => Alert.alert('Export', 'Coming soon') },
-    { icon: 'help-circle-outline', label: 'Help & Support', onPress: () => Alert.alert('Help', 'Coming soon') },
+  const MENU_ITEMS: Array<{
+    icon: keyof typeof Ionicons.glyphMap;
+    label: string;
+    screen: keyof ProfileStackParamList;
+  }> = [
+    { icon: 'person-outline',        label: 'Personal Info',      screen: 'PersonalInfo' },
+    { icon: 'medkit-outline',        label: 'Diabetes Profile',   screen: 'DiabetesProfile' },
+    { icon: 'flag-outline',          label: 'Glucose Targets',    screen: 'GlucoseTargets' },
+    { icon: 'notifications-outline', label: 'Notifications',      screen: 'Notifications' },
+    { icon: 'lock-closed-outline',   label: 'Privacy & Security', screen: 'PrivacySecurity' },
+    { icon: 'download-outline',      label: 'Export Data',        screen: 'ExportData' },
+    { icon: 'help-circle-outline',   label: 'Help & Support',     screen: 'HelpSupport' },
   ];
 
   return (
@@ -55,15 +67,19 @@ export default function ProfileScreen() {
 
         {/* Menu */}
         <Card style={styles.menuCard}>
-          {MENU_ITEMS.map((item, i) => (
-            <React.Fragment key={item.label}>
-              <TouchableOpacity style={styles.menuItem} onPress={item.onPress} activeOpacity={0.7}>
+          {MENU_ITEMS.map((item, index) => (
+            <View key={item.screen}>
+              <TouchableOpacity 
+                style={styles.menuItem} 
+                onPress={() => navigation.navigate(item.screen)} 
+                activeOpacity={0.7}
+              >
                 <Ionicons name={item.icon as any} size={20} color={Colors.textSecondary} style={styles.menuIcon} />
                 <Text style={styles.menuLabel}>{item.label}</Text>
                 <Text style={styles.menuArrow}>›</Text>
               </TouchableOpacity>
-              {i < MENU_ITEMS.length - 1 && <View style={styles.menuDivider} />}
-            </React.Fragment>
+              {index < MENU_ITEMS.length - 1 && <View style={styles.menuDivider} />}
+            </View>
           ))}
         </Card>
 

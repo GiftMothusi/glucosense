@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Shadows } from '../theme/theme';
 import { useAuthStore } from '../store/authStore';
@@ -49,7 +49,17 @@ const LogActivityScreen = React.lazy(() => import('../screens/log/LogActivityScr
 const LogHubScreen = React.lazy(() => import('../screens/log/LogHubScreen'));
 const InsightsScreen = React.lazy(() => import('../screens/insights/InsightsScreen'));
 const CareScreen = React.lazy(() => import('../screens/care/CareScreen'));
+
 const ProfileScreen = React.lazy(() => import('../screens/profile/ProfileScreen'));
+const PersonalInfoScreen       = React.lazy(() => import('../screens/profile/PersonalInfoScreen'));
+const DiabetesProfileScreen    = React.lazy(() => import('../screens/profile/DiabetesProfileScreen'));
+const GlucoseTargetsScreen     = React.lazy(() => import('../screens/profile/GlucoseTargetsScreen'));
+const NotificationsScreen      = React.lazy(() => import('../screens/profile/NotificationsScreen'));
+const PrivacySecurityScreen    = React.lazy(() => import('../screens/profile/PrivacySecurityScreen'));
+const ExportDataScreen         = React.lazy(() => import('../screens/profile/ExportDataScreen'));
+const HelpSupportScreen        = React.lazy(() => import('../screens/profile/HelpSupportScreen'));
+
+
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -86,11 +96,24 @@ export type DashboardStackParamList = {
   ActivitiesDashboard: undefined;
 };
 
+export type ProfileStackParamList = {
+  ProfileHome: undefined;
+  PersonalInfo: undefined;
+  DiabetesProfile: undefined;
+  GlucoseTargets: undefined;
+  Notifications: undefined;
+  PrivacySecurity: undefined;
+  ExportData: undefined;
+  HelpSupport: undefined;
+};
+
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const LogStack = createNativeStackNavigator<LogStackParamList>();
 const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
+const ProfileStack   = createNativeStackNavigator<ProfileStackParamList>();
+
 
 const AuthNavigator = () => (
   <AuthStack.Navigator screenOptions={{ headerShown: false }}>
@@ -131,6 +154,37 @@ const DashboardNavigator = () => (
   </DashboardStack.Navigator>
 );
 
+const profileScreenOptions = {
+  headerStyle: { backgroundColor: Colors.surface },
+  headerTintColor: Colors.textPrimary,
+  headerShadowVisible: false,
+};
+
+const ProfileNavigator = () => (
+  <ProfileStack.Navigator screenOptions={profileScreenOptions}>
+    <ProfileStack.Screen name="ProfileHome"     component={ProfileScreen as any}         options={{ headerShown: false }} />
+    <ProfileStack.Screen name="PersonalInfo"    component={PersonalInfoScreen as any}    options={{ title: 'Personal Info' }} />
+    <ProfileStack.Screen name="DiabetesProfile" component={DiabetesProfileScreen as any} options={{ title: 'Diabetes Profile' }} />
+    <ProfileStack.Screen name="GlucoseTargets"  component={GlucoseTargetsScreen as any}  options={{ title: 'Glucose Targets' }} />
+    <ProfileStack.Screen name="Notifications"   component={NotificationsScreen as any}   options={{ title: 'Notifications' }} />
+    <ProfileStack.Screen name="PrivacySecurity" component={PrivacySecurityScreen as any} options={{ title: 'Privacy & Security' }} />
+    <ProfileStack.Screen name="ExportData"      component={ExportDataScreen as any}      options={{ title: 'Export Data' }} />
+    <ProfileStack.Screen name="HelpSupport"     component={HelpSupportScreen as any}     options={{ title: 'Help & Support' }} />
+  </ProfileStack.Navigator>
+);
+
+const SuspenseFallback = () => (
+  <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
+    <Image
+      source={require('../../assets/glucosense_logo.png')}
+      style={{ width: 200, height: 200, marginBottom: Spacing.xl }}
+      resizeMode="contain"
+    />
+    <ActivityIndicator color={Colors.accent} size="large" />
+  </View>
+);
+
+
 const MainNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -154,20 +208,10 @@ const MainNavigator = () => (
     <Tab.Screen name="Log" component={LogNavigator} />
     <Tab.Screen name="Insights" component={InsightsScreen as any} />
     <Tab.Screen name="Care" component={CareScreen as any} />
-    <Tab.Screen name="Profile" component={ProfileScreen as any} />
+    <Tab.Screen name="Profile" component={ProfileNavigator as any} />
   </Tab.Navigator>
 );
 
-const SuspenseFallback = () => (
-  <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
-    <Image
-      source={require('../../assets/glucosense_logo.png')}
-      style={{ width: 200, height: 200, marginBottom: Spacing.xl }}
-      resizeMode="contain"
-    />
-    <ActivityIndicator color={Colors.accent} size="large" />
-  </View>
-);
 
 export const AppNavigator = () => {
   const { isAuthenticated, loadUser, user } = useAuthStore();
