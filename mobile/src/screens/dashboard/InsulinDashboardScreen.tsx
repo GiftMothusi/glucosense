@@ -74,6 +74,7 @@ export default function InsulinDashboardScreen() {
   }, []);
 
   const getDoseTypeIcon = (type: string) => {
+    if (!type) return 'care';
     switch (type) {
       case 'basal': return 'pre-meal';
       case 'bolus': return 'fasting';
@@ -83,10 +84,12 @@ export default function InsulinDashboardScreen() {
   };
 
   const getDoseTypeLabel = (type: string) => {
+    if (!type) return 'Unknown';
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   const getDoseTypeColor = (type: string) => {
+    if (!type) return Colors.textSecondary;
     switch (type) {
       case 'basal': return Colors.chartInsulin;
       case 'bolus': return Colors.chartMeal;
