@@ -141,7 +141,7 @@ class UserProfile(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
-    date_of_birth = Column(DateTime, nullable=True)
+    date_of_birth = Column(DateTime(timezone=True), nullable=True)
     gender = Column(String(50), nullable=True)
     height_cm = Column(Float, nullable=True)
     weight_kg = Column(Float, nullable=True)
