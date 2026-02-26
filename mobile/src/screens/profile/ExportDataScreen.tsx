@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { writeAsStringAsync } from 'expo-file-system/legacy';
+import { Paths, File } from 'expo-file-system';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { Card, Button } from '../../components/common';
 import { analyticsApi } from '../../services/api';
@@ -37,8 +39,10 @@ export default function ExportDataScreen() {
       const base64 = btoa(binary);
 
       const filename  = `GlucoSense_Report_${selectedDays}days_${Date.now()}.pdf`;
-      const fileUri   = `${FileSystem.Paths.cache}${filename}`;
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
+      const file = new File(Paths.cache, filename);
+      const fileUri = file.uri;
+      
+      await writeAsStringAsync(fileUri, base64, {
         encoding: 'base64',
       });
 

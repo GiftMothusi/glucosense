@@ -64,11 +64,11 @@ def generate_report(
 
     title_style = ParagraphStyle(
         "title", fontSize=22, textColor=PRIMARY,
-        fontName="Helvetica-Bold", spaceAfter=2
+        fontName="Helvetica-Bold", spaceAfter=12
     )
     subtitle_style = ParagraphStyle(
         "subtitle", fontSize=11, textColor=TEXT_MUTED,
-        fontName="Helvetica", spaceAfter=2
+        fontName="Helvetica", spaceBefore=4, spaceAfter=8
     )
     section_style = ParagraphStyle(
         "section", fontSize=13, textColor=TEXT_DARK,

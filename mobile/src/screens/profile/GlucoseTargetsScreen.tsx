@@ -60,12 +60,12 @@ export default function GlucoseTargetsScreen() {
 
   const toMmol = (val: string) => {
     const n = parseFloat(val);
-    return isMmol ? n : parseFloat((n / 18.0182).toFixed(2));
+    return isMmol ? n : parseFloat((n / 18.0182).toFixed(3));
   };
 
   const applyPreset = (p: typeof PRESETS[0]) => {
-    setTargetLow(isMmol  ? p.low  : String(Math.round(parseFloat(p.low)  * 18.0182)));
-    setTargetHigh(isMmol ? p.high : String(Math.round(parseFloat(p.high) * 18.0182)));
+    setTargetLow(isMmol  ? p.low  : ((parseFloat(p.low)  * 18.0182)).toFixed(0));
+    setTargetHigh(isMmol ? p.high : ((parseFloat(p.high) * 18.0182)).toFixed(0));
     setTargetTir(p.tir);
   };
 
@@ -138,9 +138,9 @@ export default function GlucoseTargetsScreen() {
               <Text style={styles.presetLabel}>{p.label}</Text>
               <Text style={styles.presetSub}>{p.sub}</Text>
               <Text style={styles.presetValues}>
-                {isMmol ? p.low : Math.round(parseFloat(p.low) * 18.0182)}
+                {isMmol ? p.low : (parseFloat(p.low) * 18.0182).toFixed(0)}
                 {' – '}
-                {isMmol ? p.high : Math.round(parseFloat(p.high) * 18.0182)}
+                {isMmol ? p.high : (parseFloat(p.high) * 18.0182).toFixed(0)}
                 {' '}
                 {unit}
               </Text>

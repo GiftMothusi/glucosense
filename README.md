@@ -47,6 +47,9 @@ python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
+#check laptop ip address on mac
+ipconfig getifaddr en0
+
 # Install core packages first
 pip install fastapi uvicorn sqlalchemy alembic asyncpg psycopg2-binary pydantic python-jose passlib bcrypt python-multipart celery redis boto3 sentry-sdk slowapi email-validator pytz aiofiles websockets pytest pytest-asyncio faker python-dotenv httpx
 

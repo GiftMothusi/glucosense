@@ -11,7 +11,7 @@ const storage = {
 };
 
 const BASE_URL = __DEV__
-  ? 'http://10.60.26.83:8000/api/v1'  // Current laptop IP
+  ? 'http://192.168.0.238:8000/api/v1'
   : 'https://api.glucosense.health/api/v1';
 
 export const api: AxiosInstance = axios.create({
