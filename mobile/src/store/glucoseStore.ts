@@ -58,6 +58,7 @@ interface GlucoseState {
     tag?: string;
     notes?: string;
     meal_id?: number;
+    recorded_at?: string;
   }) => Promise<GlucoseReading | null>;
   deleteReading: (id: number) => Promise<void>;
   setSyncStatus: (status: 'idle' | 'syncing' | 'success' | 'error' | 'unavailable') => void;
@@ -128,6 +129,7 @@ export const useGlucoseStore = create<GlucoseState>((set, get) => ({
         tag: input.tag,
         notes: input.notes,
         meal_id: input.meal_id,
+        recorded_at: input.recorded_at,
       });
       set((state) => ({
         readings: [data, ...state.readings],

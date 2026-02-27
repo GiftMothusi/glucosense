@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -27,6 +27,11 @@ export default function LogGlucoseScreen() {
   const [unit, setUnit] = useState<'mmol' | 'mgdl'>('mmol');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const [backdated, setBackdated] = useState(false);
+  const [customDate, setCustomDate] = useState(() => {
+    const d = new Date();
+    return { hour: String(d.getHours()).padStart(2, '0'), minute: String(d.getMinutes()).padStart(2, '0') };
+  });
 
   const numericValue = parseFloat(value);
   const isValid = !isNaN(numericValue) && numericValue > 0;
@@ -34,13 +39,24 @@ export default function LogGlucoseScreen() {
   const glucoseColor = isValid ? getGlucoseColor(mmolValue) : Colors.textMuted;
   const glucoseLabel = isValid ? getGlucoseLabel(mmolValue) : '';
 
+  const getRecordedAt = (): string | undefined => {
+    if (!backdated) return undefined;
+    const now = new Date();
+    const h = parseInt(customDate.hour, 10);
+    const m = parseInt(customDate.minute, 10);
+    if (isNaN(h) || isNaN(m) || h > 23 || m > 59) return undefined;
+    now.setHours(h, m, 0, 0);
+    return now.toISOString();
+  };
+
   const handleLog = async () => {
     if (!isValid) return;
-    const result = await logReading({ value: numericValue, unit, tag: selectedTag || undefined, notes: notes.trim() || undefined });
+    const recorded_at = getRecordedAt();
+    const result = await (logReading as any)({ value: numericValue, unit, tag: selectedTag || undefined, notes: notes.trim() || undefined, recorded_at });
     if (result) {
       Alert.alert(
-        'Success!',
-        'Glucose reading logged successfully',
+        'Logged!',
+        `Reading of ${numericValue} ${unit === 'mmol' ? 'mmol/L' : 'mg/dL'} saved${backdated ? ` at ${customDate.hour}:${customDate.minute}` : ''}.`,
         [{ text: 'OK', onPress: () => navigation.navigate('LogHub') }]
       );
     }
@@ -77,6 +93,43 @@ export default function LogGlucoseScreen() {
           </View>
 
           <Input label="Notes (optional)" value={notes} onChangeText={setNotes} placeholder="Any context for this reading..." multiline numberOfLines={3} />
+
+          <View style={styles.backdateRow}>
+            <View style={styles.backdateLabel}>
+              <Text style={styles.sectionLabel}>Log for an earlier time</Text>
+              <Text style={styles.backdateHint}>Toggle to change the recorded time</Text>
+            </View>
+            <Switch
+              value={backdated}
+              onValueChange={setBackdated}
+              trackColor={{ false: Colors.surfaceBorder, true: Colors.accent }}
+              thumbColor={Colors.textInverse}
+            />
+          </View>
+
+          {backdated && (
+            <View style={styles.timeRow}>
+              <View style={styles.timeField}>
+                <Text style={styles.sectionLabel}>Hour (0–23)</Text>
+                <Input
+                  value={customDate.hour}
+                  onChangeText={(v) => v.length <= 2 && setCustomDate((p) => ({ ...p, hour: v }))}
+                  keyboardType="numeric"
+                  placeholder="HH"
+                />
+              </View>
+              <Text style={styles.timeSep}>:</Text>
+              <View style={styles.timeField}>
+                <Text style={styles.sectionLabel}>Minute (0–59)</Text>
+                <Input
+                  value={customDate.minute}
+                  onChangeText={(v) => v.length <= 2 && setCustomDate((p) => ({ ...p, minute: v }))}
+                  keyboardType="numeric"
+                  placeholder="MM"
+                />
+              </View>
+            </View>
+          )}
         </ScrollView>
         <View style={styles.footer}>
           <Button label="Log Reading" onPress={handleLog} loading={isLogging} disabled={!isValid} fullWidth size="lg" />
@@ -105,4 +158,10 @@ const styles = StyleSheet.create({
   tagLabel: { color: Colors.textSecondary, fontSize: Typography.size.sm, fontWeight: '600' },
   tagLabelSelected: { color: Colors.accent },
   footer: { padding: Spacing.base },
+  backdateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: BorderRadius.md, padding: Spacing.md },
+  backdateLabel: { flex: 1, marginRight: Spacing.md },
+  backdateHint: { color: Colors.textMuted, fontSize: Typography.size.xs, marginTop: 2 },
+  timeRow: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.md },
+  timeField: { flex: 1 },
+  timeSep: { color: Colors.textPrimary, fontSize: Typography.size.xl, fontWeight: '700', paddingBottom: Spacing.md },
 });

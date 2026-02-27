@@ -11,7 +11,7 @@ import { useAuthStore } from '../../store/authStore';
 import { Card, SectionHeader, Pill } from '../../components/common';
 import { TIRRing, Sparkline } from '../../components/charts/TIRRing';
 import { getGlucoseColor, getGlucoseLabel } from '../../theme/theme';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, isToday } from 'date-fns';
 import { Icon } from '../../components/Icon';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,8 +19,8 @@ export default function DashboardScreen() {
   const navigation = useNavigation<any>();
   const { user } = useAuthStore();
   const {
-    latestReading, stats7, dailyAverages,
-    fetchLatest, fetchStats, fetchDailyAverages, isLoading,
+    latestReading, stats7, dailyAverages, readings,
+    fetchLatest, fetchStats, fetchDailyAverages, fetchReadings, isLoading,
   } = useGlucoseStore();
 
   const loadData = useCallback(async () => {
@@ -28,6 +28,7 @@ export default function DashboardScreen() {
       fetchLatest(),
       fetchStats(7),
       fetchDailyAverages(14),
+      fetchReadings(1),
     ]);
   }, []);
 
@@ -41,6 +42,7 @@ export default function DashboardScreen() {
     : 'No data';
 
   const sparklineData = dailyAverages.map((d: any) => d.avg).slice(-10);
+  const readingsToday = readings.filter((r) => isToday(new Date(r.recorded_at))).length;
 
   const firstName = user?.full_name?.split(' ')[0] ?? 'there';
   const hour = new Date().getHours();
@@ -81,12 +83,18 @@ export default function DashboardScreen() {
         {/* Current Glucose Card */}
         <Card style={styles.glucoseCard} onPress={() => navigation.navigate('LogGlucose', {})}>
           <View style={styles.glucoseCardHeader}>
-            <Text style={styles.glucoseCardTitle}>Current Glucose</Text>
-            {latestReading && (
-              <Text style={styles.glucoseTime}>
-                {formatDistanceToNow(new Date(latestReading.recorded_at), { addSuffix: true })}
-              </Text>
-            )}
+            <View>
+              <Text style={styles.glucoseCardTitle}>Current Glucose</Text>
+              {latestReading && (
+                <Text style={styles.glucoseTime}>
+                  Last checked {formatDistanceToNow(new Date(latestReading.recorded_at), { addSuffix: true })}
+                </Text>
+              )}
+            </View>
+            <View style={styles.todayBadge}>
+              <Text style={styles.todayCount}>{readingsToday}</Text>
+              <Text style={styles.todayLabel}>today</Text>
+            </View>
           </View>
 
           <View style={styles.glucoseMain}>
@@ -220,9 +228,12 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     ...Shadows.md,
   },
-  glucoseCardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.md },
+  glucoseCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.md },
   glucoseCardTitle: { color: Colors.textSecondary, fontSize: Typography.size.sm, fontWeight: '600' },
-  glucoseTime: { color: Colors.textMuted, fontSize: Typography.size.xs },
+  glucoseTime: { color: Colors.textMuted, fontSize: Typography.size.xs, marginTop: 2 },
+  todayBadge: { alignItems: 'center', backgroundColor: Colors.accentAlpha10, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.sm, paddingVertical: 4, minWidth: 40 },
+  todayCount: { color: Colors.accent, fontSize: Typography.size.lg, fontWeight: '800', lineHeight: 22 },
+  todayLabel: { color: Colors.accent, fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
   glucoseMain: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   glucoseValue: { fontSize: 64, fontWeight: '800', lineHeight: 70, letterSpacing: -2 },
   glucoseUnit: { fontSize: Typography.size.md, fontWeight: '500', marginTop: -4, opacity: 0.8 },
