@@ -48,6 +48,10 @@ const LogInsulinScreen = React.lazy(() => import('../screens/log/LogInsulinScree
 const LogActivityScreen = React.lazy(() => import('../screens/log/LogActivityScreen'));
 const LogHubScreen = React.lazy(() => import('../screens/log/LogHubScreen'));
 const InsightsScreen = React.lazy(() => import('../screens/insights/InsightsScreen'));
+const GlucoseHistoryScreen = React.lazy(() => import('../screens/insights/GlucoseHistoryScreen'));
+const MealsHistoryScreen = React.lazy(() => import('../screens/insights/MealsHistoryScreen'));
+const InsulinHistoryScreen = React.lazy(() => import('../screens/insights/InsulinHistoryScreen'));
+const ActivitiesHistoryScreen = React.lazy(() => import('../screens/insights/ActivitiesHistoryScreen'));
 const CareScreen = React.lazy(() => import('../screens/care/CareScreen'));
 
 const ProfileScreen = React.lazy(() => import('../screens/profile/ProfileScreen'));
@@ -97,6 +101,14 @@ export type DashboardStackParamList = {
   ActivitiesDashboard: undefined;
 };
 
+export type InsightsStackParamList = {
+  InsightsHome: undefined;
+  GlucoseHistory: { period: number };
+  MealsHistory: { period: number };
+  InsulinHistory: { period: number };
+  ActivitiesHistory: { period: number };
+};
+
 export type ProfileStackParamList = {
   ProfileHome: undefined;
   PersonalInfo: undefined;
@@ -114,6 +126,7 @@ const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const LogStack = createNativeStackNavigator<LogStackParamList>();
 const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
+const InsightsStack = createNativeStackNavigator<InsightsStackParamList>();
 const ProfileStack   = createNativeStackNavigator<ProfileStackParamList>();
 
 
@@ -176,6 +189,22 @@ const ProfileNavigator = () => (
   </ProfileStack.Navigator>
 );
 
+const InsightsNavigator = () => (
+  <InsightsStack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: Colors.surface },
+      headerTintColor: Colors.textPrimary,
+      headerShadowVisible: false,
+    }}
+  >
+    <InsightsStack.Screen name="InsightsHome" component={InsightsScreen as any} options={{ headerShown: false }} />
+    <InsightsStack.Screen name="GlucoseHistory" component={GlucoseHistoryScreen as any} options={{ title: 'Glucose History' }} />
+    <InsightsStack.Screen name="MealsHistory" component={MealsHistoryScreen as any} options={{ title: 'Meals History' }} />
+    <InsightsStack.Screen name="InsulinHistory" component={InsulinHistoryScreen as any} options={{ title: 'Insulin History' }} />
+    <InsightsStack.Screen name="ActivitiesHistory" component={ActivitiesHistoryScreen as any} options={{ title: 'Activities History' }} />
+  </InsightsStack.Navigator>
+);
+
 const SuspenseFallback = () => (
   <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
     <Image
@@ -207,11 +236,44 @@ const MainNavigator = () => (
       tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
     })}
   >
-    <Tab.Screen name="Dashboard" component={DashboardNavigator as any} />
-    <Tab.Screen name="Log" component={LogNavigator} />
-    <Tab.Screen name="Insights" component={InsightsScreen as any} />
+    <Tab.Screen 
+      name="Dashboard" 
+      component={DashboardNavigator as any}
+      listeners={({ navigation }) => ({
+        tabPress: () => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Dashboard' }],
+          });
+        },
+      })}
+    />
+    <Tab.Screen 
+      name="Log" 
+      component={LogNavigator}
+      listeners={({ navigation }) => ({
+        tabPress: () => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Log' }],
+          });
+        },
+      })}
+    />
+    <Tab.Screen name="Insights" component={InsightsNavigator as any} />
     <Tab.Screen name="Care" component={CareScreen as any} />
-    <Tab.Screen name="Profile" component={ProfileNavigator as any} />
+    <Tab.Screen 
+      name="Profile" 
+      component={ProfileNavigator as any}
+      listeners={({ navigation }) => ({
+        tabPress: () => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Profile' }],
+          });
+        },
+      })}
+    />
   </Tab.Navigator>
 );
 

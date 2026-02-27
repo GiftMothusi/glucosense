@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../../theme/theme';
 import { Card, SectionHeader, EmptyState, Pill } from '../../components/common';
 import { TIRRing } from '../../components/charts/TIRRing';
@@ -8,14 +10,19 @@ import { analyticsApi } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useGlucoseStore } from '../../store/glucoseStore';
 import { Icon } from '../../components/Icon';
+import type { InsightsStackParamList } from '../../navigation/AppNavigator';
+
+type InsightsScreenNavigationProp = NativeStackNavigationProp<InsightsStackParamList, 'InsightsHome'>;
 
 export default function InsightsScreen() {
+  const navigation = useNavigation<InsightsScreenNavigationProp>();
   const { user } = useAuthStore();
   const { stats7, stats30, fetchStats } = useGlucoseStore();
   const [insights, setInsights] = useState<any[]>([]);
   const [patterns, setPatterns] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [period, setPeriod] = useState<7 | 14 | 30>(14);
+  const [dataType, setDataType] = useState<'overview' | 'glucose' | 'meals' | 'insulin' | 'activities'>('overview');
 
   const loadData = async () => {
     setIsLoading(true);
@@ -52,6 +59,34 @@ export default function InsightsScreen() {
           {([7, 14, 30] as const).map((p) => (
             <TouchableOpacity key={p} style={[styles.periodBtn, period === p && styles.periodBtnActive]} onPress={() => setPeriod(p)}>
               <Text style={[styles.periodLabel, period === p && styles.periodLabelActive]}>{p} days</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.dataTypeRow}>
+          {[
+            { key: 'overview', label: 'Overview', icon: 'chart' },
+            { key: 'glucose', label: 'Glucose', icon: 'glucose' },
+            { key: 'meals', label: 'Meals', icon: 'meal' },
+            { key: 'insulin', label: 'Insulin', icon: 'medication' },
+            { key: 'activities', label: 'Activities', icon: 'activity' },
+          ].map((type) => (
+            <TouchableOpacity
+              key={type.key}
+              style={[styles.dataTypeBtn, dataType === type.key && styles.dataTypeBtnActive]}
+              onPress={() => {
+                if (type.key === 'overview') {
+                  setDataType('overview');
+                } else {
+                  // Navigate to history screen
+                  navigation.navigate(`${type.key.charAt(0).toUpperCase() + type.key.slice(1)}History` as any, { period });
+                }
+              }}
+            >
+              <Icon name={type.icon as any} size={16} color={dataType === type.key ? Colors.accent : Colors.textMuted} />
+              <Text style={[styles.dataTypeLabel, dataType === type.key && styles.dataTypeLabelActive]}>
+                {type.label}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -129,6 +164,11 @@ const styles = StyleSheet.create({
   periodBtnActive: { borderColor: Colors.accent, backgroundColor: Colors.accentAlpha10 },
   periodLabel: { color: Colors.textSecondary, fontSize: Typography.size.sm, fontWeight: '600' },
   periodLabelActive: { color: Colors.accent },
+  dataTypeRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.md },
+  dataTypeBtn: { flex: 1, padding: Spacing.sm, borderRadius: BorderRadius.md, backgroundColor: Colors.surface, borderWidth: 2, borderColor: 'transparent', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  dataTypeBtnActive: { borderColor: Colors.accent, backgroundColor: Colors.accentAlpha10 },
+  dataTypeLabel: { color: Colors.textSecondary, fontSize: Typography.size.xs, fontWeight: '600' },
+  dataTypeLabelActive: { color: Colors.accent },
   tirCard: { gap: Spacing.lg, alignItems: 'center', padding: Spacing.lg },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, width: '100%' },
   statBox: { width: '47%', backgroundColor: Colors.surfaceElevated, borderRadius: BorderRadius.md, padding: Spacing.md, gap: 4 },

@@ -148,18 +148,25 @@ export default function DashboardScreen() {
           </Card>
         )}
 
-        <SectionHeader title="Analytics" style={{ marginTop: Spacing.lg }} />
+        <SectionHeader title="Quick Log" style={{ marginTop: Spacing.lg }} />
         <View style={styles.quickLogRow}>
           {[
-            { icon: 'water-outline', label: 'Glucose', screen: 'GlucoseDashboard', color: Colors.inRange },
-            { icon: 'restaurant-outline', label: 'Meals', screen: 'MealsDashboard', color: Colors.chartMeal },
-            { icon: 'medical-outline', label: 'Insulin', screen: 'InsulinDashboard', color: Colors.chartInsulin },
-            { icon: 'walk-outline', label: 'Activities', screen: 'ActivitiesDashboard', color: Colors.chartActivity },
+            { icon: 'water-outline', label: 'Glucose', screen: 'Log', params: { screen: 'LogGlucose' }, color: Colors.inRange },
+            { icon: 'restaurant-outline', label: 'Meals', screen: 'Log', params: { screen: 'LogMeal' }, color: Colors.chartMeal },
+            { icon: 'medical-outline', label: 'Insulin', screen: 'Log', params: { screen: 'LogInsulin' }, color: Colors.chartInsulin },
+            { icon: 'walk-outline', label: 'Activities', screen: 'Log', params: { screen: 'LogActivity' }, color: Colors.chartActivity },
           ].map((item) => (
             <TouchableOpacity
-              key={item.screen}
+              key={item.label}
               style={styles.quickLogBtn}
-              onPress={() => navigation.navigate(item.screen)}
+              onPress={() => {
+                // Navigate to the Log tab first, then to the specific logging screen
+                navigation.getParent()?.navigate('Log');
+                // Small delay to ensure the Log stack is ready
+                setTimeout(() => {
+                  navigation.navigate('Log', { screen: item.params.screen });
+                }, 150);
+              }}
               activeOpacity={0.8}
             >
               <Ionicons name={item.icon as any} size={28} color={item.color} style={styles.quickLogIcon} />

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { LogStackParamList } from '../../navigation/AppNavigator';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { activityApi } from '../../services/api';
@@ -20,8 +22,10 @@ const ACTIVITY_TYPES = [
 
 const INTENSITIES = ['low', 'moderate', 'high'];
 
+type LogActivityScreenNavigationProp = NativeStackNavigationProp<LogStackParamList, 'LogActivity'>;
+
 export default function LogActivityScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LogActivityScreenNavigationProp>();
   const [activityType, setActivityType] = useState('');
   const [intensity, setIntensity] = useState('moderate');
   const [duration, setDuration] = useState('');
@@ -42,7 +46,11 @@ export default function LogActivityScreen() {
         glucose_after: glucoseAfter ? parseFloat(glucoseAfter) : undefined,
         notes: notes.trim() || undefined,
       });
-      navigation.goBack();
+      Alert.alert(
+        'Success!',
+        'Activity logged successfully',
+        [{ text: 'OK', onPress: () => navigation.navigate('LogHub') }]
+      );
     } catch { setIsLoading(false); }
   };
 

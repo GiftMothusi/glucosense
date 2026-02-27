@@ -159,8 +159,8 @@ export default function OnboardingScreen() {
             fullWidth size="lg"
           />
         )}
-        <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}>
-          <Text style={styles.skipText}>Skip for now</Text>
+        <TouchableOpacity onPress={handleSkip} style={styles.skipBtn} disabled={isLoading}>
+          <Text style={[styles.skipText, isLoading && { opacity: 0.5 }]}>Skip for now</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { mealApi } from '../../services/api';
 import { Icon, IconName } from '../../components/Icon';
+import type { LogStackParamList } from '../../navigation/AppNavigator';
 
 const MEAL_TYPES: Array<{ key: string; label: string; icon: IconName }> = [
   { key: 'breakfast', label: 'Breakfast', icon: 'fasting' },
@@ -14,8 +16,10 @@ const MEAL_TYPES: Array<{ key: string; label: string; icon: IconName }> = [
   { key: 'snack', label: 'Snack', icon: 'meal' },
 ];
 
+type LogMealScreenNavigationProp = NativeStackNavigationProp<LogStackParamList, 'LogMeal'>;
+
 export default function LogMealScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LogMealScreenNavigationProp>();
   const [mealName, setMealName] = useState('');
   const [mealType, setMealType] = useState('');
   const [carbs, setCarbs] = useState('');
@@ -45,7 +49,11 @@ export default function LogMealScreen() {
       console.log('Meal logged successfully:', JSON.stringify(response.data));
 
       setIsLoading(false);
-      navigation.goBack();
+      Alert.alert(
+        'Success!',
+        'Meal logged successfully',
+        [{ text: 'OK', onPress: () => navigation.navigate('LogHub') }]
+      );
     } catch (error: any) {
       console.log('Meal log error:', JSON.stringify(error?.response?.data), 'Status:', error?.response?.status);
       setIsLoading(false);

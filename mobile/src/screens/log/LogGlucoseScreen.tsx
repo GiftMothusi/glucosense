@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Typography, BorderRadius, getGlucoseColor, getGlucoseLabel } from '../../theme/theme';
 import { Button, Input, Card } from '../../components/common';
 import { useGlucoseStore } from '../../store/glucoseStore';
 import { Icon, IconName } from '../../components/Icon';
+import type { LogStackParamList } from '../../navigation/AppNavigator';
 
 const TAGS: Array<{ key: string; label: string; icon: IconName }> = [
   { key: 'fasting', label: 'Fasting', icon: 'fasting' },
@@ -16,8 +18,10 @@ const TAGS: Array<{ key: string; label: string; icon: IconName }> = [
   { key: 'sick', label: 'Sick', icon: 'sick' },
 ];
 
+type LogGlucoseScreenNavigationProp = NativeStackNavigationProp<LogStackParamList, 'LogGlucose'>;
+
 export default function LogGlucoseScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LogGlucoseScreenNavigationProp>();
   const { logReading, isLogging } = useGlucoseStore();
   const [value, setValue] = useState('');
   const [unit, setUnit] = useState<'mmol' | 'mgdl'>('mmol');
@@ -33,7 +37,13 @@ export default function LogGlucoseScreen() {
   const handleLog = async () => {
     if (!isValid) return;
     const result = await logReading({ value: numericValue, unit, tag: selectedTag || undefined, notes: notes.trim() || undefined });
-    if (result) navigation.goBack();
+    if (result) {
+      Alert.alert(
+        'Success!',
+        'Glucose reading logged successfully',
+        [{ text: 'OK', onPress: () => navigation.navigate('LogHub') }]
+      );
+    }
   };
 
   return (
