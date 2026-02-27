@@ -22,9 +22,10 @@ export default function ProfileScreen() {
     label: string;
     screen: keyof ProfileStackParamList;
   }> = [
-    { icon: 'person-outline',        label: 'Personal Info',      screen: 'PersonalInfo' },
-    { icon: 'medkit-outline',        label: 'Diabetes Profile',   screen: 'DiabetesProfile' },
-    { icon: 'flag-outline',          label: 'Glucose Targets',    screen: 'GlucoseTargets' },
+    { icon: 'person-outline',        label: 'Personal Info',         screen: 'PersonalInfo' },
+    { icon: 'medkit-outline',        label: 'Diabetes Profile',      screen: 'DiabetesProfile' },
+    { icon: 'sync-outline',          label: 'Health Connect Sync',   screen: 'HealthConnect' },
+    { icon: 'flag-outline',          label: 'Glucose Targets',       screen: 'GlucoseTargets' },
     { icon: 'notifications-outline', label: 'Notifications',      screen: 'Notifications' },
     { icon: 'lock-closed-outline',   label: 'Privacy & Security', screen: 'PrivacySecurity' },
     { icon: 'download-outline',      label: 'Export Data',        screen: 'ExportData' },

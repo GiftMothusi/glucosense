@@ -7,6 +7,7 @@ from app.models.models import (
     MealType, InsightCategory, SubscriptionPlan,
 )
 
+
 MMOL_TO_MGDL = 18.0182
 
 
@@ -123,7 +124,8 @@ class GlucoseReadingCreate(BaseModel):
     trend_rate: Optional[float] = None
     notes: Optional[str] = None
     meal_id: Optional[int] = None
-    recorded_at: Optional[datetime] = None  
+    recorded_at: Optional[datetime] = None
+    external_id: Optional[str] = None
 
     def to_mmol(self) -> float:
         if self.unit == GlucoseUnit.MGDL:
@@ -147,8 +149,31 @@ class GlucoseReadingResponse(BaseModel):
     notes: Optional[str]
     meal_id: Optional[int]
     recorded_at: datetime
+    external_id: Optional[str] = None
 
     model_config = {"from_attributes": True}
+
+
+class SyncReadingItem(BaseModel):
+    value: float
+    unit: GlucoseUnit = GlucoseUnit.MMOL
+    recorded_at: datetime
+    external_id: str
+    source: GlucoseSource = GlucoseSource.HEALTH_CONNECT
+    tag: Optional[GlucoseTag] = None
+    trend_arrow: Optional[str] = None
+    trend_rate: Optional[float] = None
+
+
+class SyncRequest(BaseModel):
+    readings: List[SyncReadingItem] = Field(default=[], max_length=500)
+
+
+class SyncResponse(BaseModel):
+    imported: int
+    skipped_duplicates: int
+    errors: int
+    message: str
 
 
 class GlucoseListResponse(BaseModel):

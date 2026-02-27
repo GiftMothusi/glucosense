@@ -58,6 +58,7 @@ const NotificationsScreen      = React.lazy(() => import('../screens/profile/Not
 const PrivacySecurityScreen    = React.lazy(() => import('../screens/profile/PrivacySecurityScreen'));
 const ExportDataScreen         = React.lazy(() => import('../screens/profile/ExportDataScreen'));
 const HelpSupportScreen        = React.lazy(() => import('../screens/profile/HelpSupportScreen'));
+const HealthConnectScreen      = React.lazy(() => import('../screens/profile/HealthConnectScreen'));
 
 
 
@@ -100,6 +101,7 @@ export type ProfileStackParamList = {
   ProfileHome: undefined;
   PersonalInfo: undefined;
   DiabetesProfile: undefined;
+  HealthConnect: undefined;
   GlucoseTargets: undefined;
   Notifications: undefined;
   PrivacySecurity: undefined;
@@ -168,6 +170,7 @@ const ProfileNavigator = () => (
     <ProfileStack.Screen name="GlucoseTargets"  component={GlucoseTargetsScreen as any}  options={{ title: 'Glucose Targets' }} />
     <ProfileStack.Screen name="Notifications"   component={NotificationsScreen as any}   options={{ title: 'Notifications' }} />
     <ProfileStack.Screen name="PrivacySecurity" component={PrivacySecurityScreen as any} options={{ title: 'Privacy & Security' }} />
+    <ProfileStack.Screen name="HealthConnect"   component={HealthConnectScreen as any}   options={{ title: 'Health Connect Sync' }} />
     <ProfileStack.Screen name="ExportData"      component={ExportDataScreen as any}      options={{ title: 'Export Data' }} />
     <ProfileStack.Screen name="HelpSupport"     component={HelpSupportScreen as any}     options={{ title: 'Help & Support' }} />
   </ProfileStack.Navigator>

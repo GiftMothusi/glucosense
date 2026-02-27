@@ -35,7 +35,14 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "RECEIVE_BOOT_COMPLETED",
-        "VIBRATE"
+        "VIBRATE",
+        "android.permission.health.READ_BLOOD_GLUCOSE",
+        "android.permission.FOREGROUND_SERVICE"
+      ],
+      "intentFilters": [
+        {
+          "action": "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"
+        }
       ]
     },
     "web": {

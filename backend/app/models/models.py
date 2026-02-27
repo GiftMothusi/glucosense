@@ -34,6 +34,8 @@ class GlucoseSource(str, enum.Enum):
     MANUAL = "manual"
     CGM = "cgm"
     METER_BLUETOOTH = "meter_bluetooth"
+    HEALTH_CONNECT = "health_connect"
+    CGM_API = "cgm_api"
 
 class GlucoseTag(str, enum.Enum):
     FASTING = "fasting"
@@ -147,7 +149,7 @@ class UserProfile(Base):
     weight_kg = Column(Float, nullable=True)
     country = Column(String(100), nullable=True)
     timezone = Column(String(100), default="UTC")
-    glucose_unit = Column(Enum(GlucoseUnit), default=GlucoseUnit.MMOL)
+    glucose_unit = Column(Enum(GlucoseUnit, values_callable=lambda x: [e.value for e in x]), default=GlucoseUnit.MMOL)
     onboarding_completed = Column(Boolean, default=False)
     push_token = Column(String(512), nullable=True)
     notification_settings = Column(JSON, default=dict)
@@ -161,7 +163,7 @@ class DiabetesProfile(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
-    diabetes_type = Column(Enum(DiabetesType), nullable=False)
+    diabetes_type = Column(Enum(DiabetesType, values_callable=lambda x: [e.value for e in x]), nullable=False)
     diagnosis_year = Column(Integer, nullable=True)
     target_glucose_low = Column(Float, default=3.9)   # mmol/L
     target_glucose_high = Column(Float, default=10.0)
@@ -187,11 +189,12 @@ class GlucoseReading(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     value_mmol = Column(Float, nullable=False)        # always stored as mmol/L
     value_mgdl = Column(Float, nullable=False)        # also stored for display
-    source = Column(Enum(GlucoseSource), default=GlucoseSource.MANUAL)
-    tag = Column(Enum(GlucoseTag), nullable=True)
+    source = Column(Enum(GlucoseSource, values_callable=lambda x: [e.value for e in x]), default=GlucoseSource.MANUAL)
+    tag = Column(Enum(GlucoseTag, values_callable=lambda x: [e.value for e in x]), nullable=True)
     trend_arrow = Column(String(20), nullable=True)   # "rising", "falling", "stable", etc.
     trend_rate = Column(Float, nullable=True)         # mmol/L per minute
     notes = Column(Text, nullable=True)
+    external_id = Column(String(200), nullable=True, index=True)
     meal_id = Column(Integer, ForeignKey("meals.id"), nullable=True)
     recorded_at = Column(DateTime(timezone=True), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow)
@@ -201,6 +204,7 @@ class GlucoseReading(Base):
 
     __table_args__ = (
         Index("ix_glucose_user_recorded", "user_id", "recorded_at"),
+        UniqueConstraint("user_id", "external_id", name="uq_glucose_user_external_id"),
     )
 
 
@@ -230,8 +234,8 @@ class InsulinDose(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     insulin_name = Column(String(100), nullable=False)
-    insulin_type = Column(Enum(InsulinType), nullable=False)
-    delivery_method = Column(Enum(InsulinDelivery), default=InsulinDelivery.PEN)
+    insulin_type = Column(Enum(InsulinType, values_callable=lambda x: [e.value for e in x]), nullable=False)
+    delivery_method = Column(Enum(InsulinDelivery, values_callable=lambda x: [e.value for e in x]), default=InsulinDelivery.PEN)
     units = Column(Float, nullable=False)
     is_correction = Column(Boolean, default=False)
     is_basal = Column(Boolean, default=False)
@@ -257,7 +261,7 @@ class Meal(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String(255), nullable=False)
-    meal_type = Column(Enum(MealType), nullable=False)
+    meal_type = Column(Enum(MealType, values_callable=lambda x: [e.value for e in x]), nullable=False)
     total_carbs_g = Column(Float, default=0.0)
     total_protein_g = Column(Float, default=0.0)
     total_fat_g = Column(Float, default=0.0)
@@ -327,8 +331,8 @@ class Activity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    activity_type = Column(Enum(ActivityType), nullable=False)
-    intensity = Column(Enum(ActivityIntensity), default=ActivityIntensity.MODERATE)
+    activity_type = Column(Enum(ActivityType, values_callable=lambda x: [e.value for e in x]), nullable=False)
+    intensity = Column(Enum(ActivityIntensity, values_callable=lambda x: [e.value for e in x]), default=ActivityIntensity.MODERATE)
     duration_minutes = Column(Integer, nullable=False)
     steps = Column(Integer, nullable=True)
     distance_km = Column(Float, nullable=True)
@@ -422,7 +426,7 @@ class Insight(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    category = Column(Enum(InsightCategory), nullable=False)
+    category = Column(Enum(InsightCategory, values_callable=lambda x: [e.value for e in x]), nullable=False)
     title = Column(String(255), nullable=False)
     body = Column(Text, nullable=False)
     data = Column(JSON, nullable=True)              # supporting chart data
@@ -549,8 +553,8 @@ class Subscription(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
-    plan = Column(Enum(SubscriptionPlan), default=SubscriptionPlan.FREE)
-    status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.ACTIVE)
+    plan = Column(Enum(SubscriptionPlan, values_callable=lambda x: [e.value for e in x]), default=SubscriptionPlan.FREE)
+    status = Column(Enum(SubscriptionStatus, values_callable=lambda x: [e.value for e in x]), default=SubscriptionStatus.ACTIVE)
     provider = Column(String(50), nullable=True)          # "stripe", "google_play", "apple"
     provider_subscription_id = Column(String(255), nullable=True)
     trial_ends_at = Column(DateTime(timezone=True), nullable=True)

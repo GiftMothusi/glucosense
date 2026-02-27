@@ -11,7 +11,7 @@ const storage = {
 };
 
 const BASE_URL = __DEV__
-  ? 'http://192.168.0.238:8000/api/v1'
+  ? 'http://10.60.26.83:8000/api/v1'
   : 'https://api.glucosense.health/api/v1';
 
 export const api: AxiosInstance = axios.create({
@@ -94,6 +94,8 @@ export const glucoseApi = {
   hourlyProfile: (days = 30) => api.get('/glucose/hourly-profile', { params: { days } }),
   dailyAverages: (days = 30) => api.get('/glucose/daily-averages', { params: { days } }),
   delete: (id: number) => api.delete(`/glucose/${id}`),
+  syncReadings: (readings: any[]) =>
+    api.post('/glucose/sync', { readings }),
 };
 
 export const mealApi = {

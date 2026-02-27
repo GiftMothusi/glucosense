@@ -6,103 +6,82 @@ A production-grade, full-stack diabetes management application built with React 
 
 | Layer | Technology |
 |---|---|
-| Mobile | React Native (Expo bare workflow) + TypeScript |
+| Mobile | React Native (Expo) + TypeScript |
 | State | Zustand + React Query |
 | Charts | React Native SVG + Victory Native |
-| Backend | FastAPI (async) + Python 3.12 |
-| Database | PostgreSQL + TimescaleDB |
+| Backend | FastAPI (async) + Python 3.13 |
+| Database | PostgreSQL 17 (local) |
 | Analytics | Pandas, NumPy, Scikit-learn, Prophet |
 | Cache / Queue | Redis + Celery |
 | Auth | JWT (access + refresh token) |
-| Infra | Docker Compose (dev) → Railway (prod) |
 
 ---
 
 ## Local Development Setup
 
 ### Prerequisites
-- Python 3.13 (works with 3.12+)
+- Python 3.13
 - Node.js 20+
-- Docker + Docker Compose
+- PostgreSQL 17 (`sudo apt install postgresql`)
+- Redis (`sudo apt install redis-server`)
 - Expo Go app on your phone
 
-### 1. Start Infrastructure (Database + Redis)
+### Quick Start
 
 ```bash
-cd infra
-cp .env.example .env
-# Edit .env with PostgreSQL password (default: postgres123)
+# Terminal 1 — Backend (runs migrations + starts API)
+./start-backend.sh
 
-docker compose up postgres redis -d
+# Terminal 2 — Mobile
+./start-mobile.sh
 ```
 
-### 2. Backend Setup
+### Manual Setup (first time)
 
+**Backend:**
 ```bash
 cd backend
-cp .env.example .env
-# Edit .env - update DATABASE_URL to match infra/.env password
-
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-#check laptop ip address on mac
-ipconfig getifaddr en0
-
-# Install core packages first
-pip install fastapi uvicorn sqlalchemy alembic asyncpg psycopg2-binary pydantic python-jose passlib bcrypt python-multipart celery redis boto3 sentry-sdk slowapi email-validator pytz aiofiles websockets pytest pytest-asyncio faker python-dotenv httpx
-
-# Install data science packages (Python 3.13 compatible versions)
-pip install --only-binary=:all: pandas scipy scikit-learn prophet reportlab pillow numpy
-
-# Handle database migrations
-alembic stamp head  # Skip problematic migration for now
-# alembic upgrade head  # Use this when migrations are fixed
-
-# Start the API
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # edit if needed
+alembic upgrade head
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-API docs available at: http://localhost:8000/docs
-
-### 3. Mobile App Setup
-
+**Mobile:**
 ```bash
 cd mobile
 npm install --legacy-peer-deps
-npx expo start
+npx expo start --clear
 ```
 
-**Mobile Connection Issues?**
-- If QR code doesn't work: In Expo Go app, tap "Enter URL manually" and type the LAN URL shown in terminal
-- Make sure phone and laptop are on same WiFi
-- Try `npx expo start --tunnel` if LAN doesn't work (requires ngrok installation)
-- For testing: `npx expo start --web` opens in browser
+API docs: `http://localhost:8000/docs`
 
-### Troubleshooting Common Issues
+### Mobile Backend URL
 
-**Python package installation fails:**
-- Use `pip install --only-binary=:all: <package>` for precompiled wheels
-- Python 3.13 may have compilation issues with some packages
+Edit `mobile/src/services/api.ts` and set `BASE_URL` to your laptop's LAN IP:
+```ts
+const BASE_URL = __DEV__
+  ? 'http://<YOUR_LAPTOP_IP>:8000/api/v1'
+  : 'https://api.glucosense.health/api/v1';
+```
+
+Find your IP with: `hostname -I | awk '{print $1}'`
+
+### Troubleshooting
 
 **Migration errors:**
-- Use `alembic stamp head` to mark database as current
-- Or reset database: `docker compose down postgres && docker volume rm infra_postgres_data && docker compose up postgres -d`
+```bash
+# Full reset (drops all tables and re-runs)
+sudo -u postgres psql -p 5433 -d glucosense -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;"
+cd backend && ./venv/bin/alembic upgrade head
+```
 
 **Mobile connection issues:**
-- Check phone/laptop are on same WiFi
-- Use manual URL entry in Expo Go
-- Try tunnel mode: `npx expo start --tunnel`
-
----
-
-### Full Docker setup (API + DB + Redis together)
-
-```bash
-cd infra
-docker-compose up --build
-```
+- Make sure phone and laptop are on the same WiFi
+- Use manual URL entry in Expo Go if QR doesn't work
+- Try `npx expo start --tunnel` as a fallback
 
 ---
 
@@ -110,13 +89,13 @@ docker-compose up --build
 
 ```
 glucosense/
+├── start-backend.sh            # Start backend (one command)
+├── start-mobile.sh             # Start mobile (one command)
+│
 ├── backend/                    # Python FastAPI backend
 │   ├── app/
 │   │   ├── api/routes/         # All API endpoints
 │   │   ├── analytics/          # ML/stats engine
-│   │   │   ├── glucose/        # TIR, patterns, predictions
-│   │   │   ├── nutrition/      # Meal impact scoring
-│   │   │   └── correlations/   # Cross-variable analysis
 │   │   ├── models/             # SQLAlchemy ORM models
 │   │   ├── schemas/            # Pydantic request/response schemas
 │   │   ├── services/           # Business logic layer
@@ -125,16 +104,14 @@ glucosense/
 │   ├── migrations/             # Alembic migrations
 │   └── tests/
 │
-├── mobile/                     # React Native (Expo) app
-│   └── src/
-│       ├── screens/            # All app screens
-│       ├── components/         # Reusable UI + charts
-│       ├── store/              # Zustand state stores
-│       ├── services/           # API client (axios)
-│       ├── navigation/         # React Navigation setup
-│       └── theme/              # Design system (colors, type, spacing)
-│
-└── infra/                      # Docker Compose configs
+└── mobile/                     # React Native (Expo) app
+    └── src/
+        ├── screens/            # All app screens
+        ├── components/         # Reusable UI + charts
+        ├── store/              # Zustand state stores
+        ├── services/           # API client (axios)
+        ├── navigation/         # React Navigation setup
+        └── theme/              # Design system
 ```
 
 ---

@@ -8,53 +8,6 @@ branch_labels = None
 depends_on = None
 
 
-def _create_enums():
-    op.execute("""
-        CREATE TYPE diabetestype AS ENUM
-            ('type_1', 'type_2', 'gestational', 'prediabetes', 'other')
-    """)
-    op.execute("""
-        CREATE TYPE glucoseunit AS ENUM ('mmol', 'mgdl')
-    """)
-    op.execute("""
-        CREATE TYPE glucosesource AS ENUM ('manual', 'cgm', 'meter_bluetooth')
-    """)
-    op.execute("""
-        CREATE TYPE glucosetag AS ENUM
-            ('fasting', 'pre_meal', 'post_meal', 'bedtime', 'night',
-             'exercise', 'sick', 'stress', 'other')
-    """)
-    op.execute("""
-        CREATE TYPE insulintype AS ENUM
-            ('rapid', 'short', 'intermediate', 'long', 'ultra_long', 'premixed')
-    """)
-    op.execute("""
-        CREATE TYPE insulindelivery AS ENUM ('injection', 'pump', 'pen')
-    """)
-    op.execute("""
-        CREATE TYPE activitytype AS ENUM
-            ('walking', 'running', 'cycling', 'swimming', 'gym', 'yoga', 'sport', 'other')
-    """)
-    op.execute("""
-        CREATE TYPE activityintensity AS ENUM ('low', 'moderate', 'high')
-    """)
-    op.execute("""
-        CREATE TYPE mealtype AS ENUM
-            ('breakfast', 'lunch', 'dinner', 'snack', 'other')
-    """)
-    op.execute("""
-        CREATE TYPE insightcategory AS ENUM
-            ('pattern', 'prediction', 'correlation', 'achievement', 'warning', 'tip')
-    """)
-    op.execute("""
-        CREATE TYPE subscriptionplan AS ENUM
-            ('free', 'premium_monthly', 'premium_annual')
-    """)
-    op.execute("""
-        CREATE TYPE subscriptionstatus AS ENUM
-            ('active', 'cancelled', 'expired', 'trial')
-    """)
-
 
 def _drop_enums():
     op.execute("DROP TYPE IF EXISTS diabetestype")
@@ -73,7 +26,19 @@ def _drop_enums():
 
 
 def upgrade() -> None:
-    _create_enums()
+    conn = op.get_bind()
+    conn.execute(sa.text("CREATE TYPE diabetestype AS ENUM ('type_1','type_2','gestational','prediabetes','other')"))
+    conn.execute(sa.text("CREATE TYPE glucoseunit AS ENUM ('mmol','mgdl')"))
+    conn.execute(sa.text("CREATE TYPE glucosesource AS ENUM ('manual','cgm','meter_bluetooth')"))
+    conn.execute(sa.text("CREATE TYPE glucosetag AS ENUM ('fasting','pre_meal','post_meal','bedtime','night','exercise','sick','stress','other')"))
+    conn.execute(sa.text("CREATE TYPE insulintype AS ENUM ('rapid','short','intermediate','long','ultra_long','premixed')"))
+    conn.execute(sa.text("CREATE TYPE insulindelivery AS ENUM ('injection','pump','pen')"))
+    conn.execute(sa.text("CREATE TYPE activitytype AS ENUM ('walking','running','cycling','swimming','gym','yoga','sport','other')"))
+    conn.execute(sa.text("CREATE TYPE activityintensity AS ENUM ('low','moderate','high')"))
+    conn.execute(sa.text("CREATE TYPE mealtype AS ENUM ('breakfast','lunch','dinner','snack','other')"))
+    conn.execute(sa.text("CREATE TYPE insightcategory AS ENUM ('pattern','prediction','correlation','achievement','warning','tip')"))
+    conn.execute(sa.text("CREATE TYPE subscriptionplan AS ENUM ('free','premium_monthly','premium_annual')"))
+    conn.execute(sa.text("CREATE TYPE subscriptionstatus AS ENUM ('active','cancelled','expired','trial')"))
 
     op.create_table(
         'users',
@@ -127,7 +92,7 @@ def upgrade() -> None:
         sa.Column('country',               sa.String(100), nullable=True),
         sa.Column('timezone',              sa.String(100), nullable=True, server_default='UTC'),
         sa.Column('glucose_unit',
-                  sa.Enum('mmol', 'mgdl', name='glucoseunit', create_type=False),
+                  postgresql.ENUM('mmol', 'mgdl', name='glucoseunit', create_type=False),
                   nullable=True, server_default='mmol'),
         sa.Column('onboarding_completed',  sa.Boolean(),  nullable=True, server_default='false'),
         sa.Column('push_token',            sa.String(512), nullable=True),
@@ -144,7 +109,7 @@ def upgrade() -> None:
                   sa.ForeignKey('users.id', ondelete='CASCADE'),
                   nullable=False),
         sa.Column('diabetes_type',
-                  sa.Enum('type_1', 'type_2', 'gestational', 'prediabetes', 'other',
+                  postgresql.ENUM('type_1', 'type_2', 'gestational', 'prediabetes', 'other',
                            name='diabetestype', create_type=False),
                   nullable=False),
         sa.Column('diagnosis_year',      sa.Integer(), nullable=True),
@@ -170,17 +135,19 @@ def upgrade() -> None:
                   sa.ForeignKey('users.id', ondelete='CASCADE'),
                   nullable=False),
         sa.Column('plan',
-                  sa.Enum('free', 'premium_monthly', 'premium_annual',
+                  postgresql.ENUM('free', 'premium_monthly', 'premium_annual',
                            name='subscriptionplan', create_type=False),
                   nullable=False, server_default='free'),
         sa.Column('status',
-                  sa.Enum('active', 'cancelled', 'expired', 'trial',
+                  postgresql.ENUM('active', 'cancelled', 'expired', 'trial',
                            name='subscriptionstatus', create_type=False),
                   nullable=False, server_default='active'),
         sa.Column('provider',                    sa.String(50),  nullable=True),
         sa.Column('provider_subscription_id',    sa.String(255), nullable=True),
+        sa.Column('trial_ends_at',               sa.DateTime(timezone=True), nullable=True),
         sa.Column('current_period_start',        sa.DateTime(timezone=True), nullable=True),
         sa.Column('current_period_end',          sa.DateTime(timezone=True), nullable=True),
+        sa.Column('cancelled_at',                sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_at',                  sa.DateTime(timezone=True), nullable=True,
                   server_default=sa.text('now()')),
         sa.Column('updated_at',                  sa.DateTime(timezone=True), nullable=True),
@@ -195,13 +162,14 @@ def upgrade() -> None:
                   nullable=False),
         sa.Column('name',            sa.String(255), nullable=False),
         sa.Column('meal_type',
-                  sa.Enum('breakfast', 'lunch', 'dinner', 'snack', 'other',
+                  postgresql.ENUM('breakfast', 'lunch', 'dinner', 'snack', 'other',
                            name='mealtype', create_type=False),
                   nullable=False),
         sa.Column('total_carbs_g',   sa.Float(), nullable=True, server_default='0'),
         sa.Column('total_protein_g', sa.Float(), nullable=True, server_default='0'),
         sa.Column('total_fat_g',     sa.Float(), nullable=True, server_default='0'),
         sa.Column('total_calories',  sa.Float(), nullable=True, server_default='0'),
+        sa.Column('total_fiber_g',   sa.Float(), nullable=True, server_default='0'),
         sa.Column('glycemic_index',  sa.Float(), nullable=True),
         sa.Column('glycemic_load',   sa.Float(), nullable=True),
         sa.Column('photo_url',       sa.String(512), nullable=True),
@@ -223,16 +191,18 @@ def upgrade() -> None:
         sa.Column('value_mmol',  sa.Float(), nullable=False),
         sa.Column('value_mgdl',  sa.Float(), nullable=False),
         sa.Column('source',
-                  sa.Enum('manual', 'cgm', 'meter_bluetooth',
+                  postgresql.ENUM('manual', 'cgm', 'meter_bluetooth',
                            name='glucosesource', create_type=False),
                   nullable=True, server_default='manual'),
         sa.Column('tag',
-                  sa.Enum('fasting', 'pre_meal', 'post_meal', 'bedtime', 'night',
+                  postgresql.ENUM('fasting', 'pre_meal', 'post_meal', 'bedtime', 'night',
                            'exercise', 'sick', 'stress', 'other',
                            name='glucosetag', create_type=False),
                   nullable=True),
         sa.Column('trend_arrow', sa.String(20),  nullable=True),
+        sa.Column('trend_rate',  sa.Float(),     nullable=True),
         sa.Column('notes',       sa.Text(),      nullable=True),
+        sa.Column('external_id', sa.String(200), nullable=True),
         sa.Column('meal_id',     sa.Integer(),
                   sa.ForeignKey('meals.id', ondelete='SET NULL'),
                   nullable=True),
@@ -243,6 +213,7 @@ def upgrade() -> None:
     op.create_index('ix_glucose_readings_id',          'glucose_readings', ['id'],          unique=False)
     op.create_index('ix_glucose_readings_user_id',     'glucose_readings', ['user_id'],     unique=False)
     op.create_index('ix_glucose_readings_recorded_at', 'glucose_readings', ['recorded_at'], unique=False)
+    op.create_index('ix_glucose_readings_external_id', 'glucose_readings', ['external_id'], unique=False)
     op.create_index('ix_glucose_user_time',            'glucose_readings',
                     ['user_id', 'recorded_at'], unique=False)
 
@@ -272,11 +243,11 @@ def upgrade() -> None:
                   nullable=False),
         sa.Column('insulin_name',    sa.String(255), nullable=False),
         sa.Column('insulin_type',
-                  sa.Enum('rapid', 'short', 'intermediate', 'long', 'ultra_long', 'premixed',
+                  postgresql.ENUM('rapid', 'short', 'intermediate', 'long', 'ultra_long', 'premixed',
                            name='insulintype', create_type=False),
                   nullable=False),
         sa.Column('delivery_method',
-                  sa.Enum('injection', 'pump', 'pen',
+                  postgresql.ENUM('injection', 'pump', 'pen',
                            name='insulindelivery', create_type=False),
                   nullable=True, server_default='pen'),
         sa.Column('units',           sa.Float(),   nullable=False),
@@ -318,12 +289,12 @@ def upgrade() -> None:
                   sa.ForeignKey('users.id', ondelete='CASCADE'),
                   nullable=False),
         sa.Column('activity_type',
-                  sa.Enum('walking', 'running', 'cycling', 'swimming',
+                  postgresql.ENUM('walking', 'running', 'cycling', 'swimming',
                            'gym', 'yoga', 'sport', 'other',
                            name='activitytype', create_type=False),
                   nullable=False),
         sa.Column('intensity',
-                  sa.Enum('low', 'moderate', 'high',
+                  postgresql.ENUM('low', 'moderate', 'high',
                            name='activityintensity', create_type=False),
                   nullable=True, server_default='moderate'),
         sa.Column('duration_minutes', sa.Integer(), nullable=False),
@@ -424,7 +395,7 @@ def upgrade() -> None:
                   sa.ForeignKey('users.id', ondelete='CASCADE'),
                   nullable=False),
         sa.Column('category',
-                  sa.Enum('pattern', 'prediction', 'correlation',
+                  postgresql.ENUM('pattern', 'prediction', 'correlation',
                            'achievement', 'warning', 'tip',
                            name='insightcategory', create_type=False),
                   nullable=False),

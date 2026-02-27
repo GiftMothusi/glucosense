@@ -1,5 +1,7 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 
@@ -8,7 +10,10 @@ from app.services.glucose_service import GlucoseService
 from app.schemas.schemas import (
     GlucoseReadingCreate, GlucoseReadingResponse,
     GlucoseListResponse, GlucoseStatsResponse, TIRResponse,
+    SyncRequest, SyncResponse,
 )
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/glucose", tags=["Glucose"])
 
@@ -115,6 +120,17 @@ async def daily_averages(
 ):
     averages = await GlucoseService.get_daily_averages(db, current_user.id, days=days)
     return {"averages": averages}
+
+
+@router.post("/sync", response_model=SyncResponse, status_code=status.HTTP_200_OK)
+@limiter.limit("10/hour")
+async def sync_glucose(
+    request: Request,
+    data: SyncRequest,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await GlucoseService.bulk_sync(db, current_user.id, data.readings)
 
 
 @router.delete("/{reading_id}", status_code=status.HTTP_204_NO_CONTENT)

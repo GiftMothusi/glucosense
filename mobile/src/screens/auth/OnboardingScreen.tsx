@@ -55,6 +55,18 @@ export default function OnboardingScreen() {
     }
   };
 
+  const handleSkip = async () => {
+    setIsLoading(true);
+    try {
+      await userApi.updateProfile({ onboarding_completed: true });
+      await loadUser();
+    } catch (e) {
+      await loadUser();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.progressBar}>
@@ -147,7 +159,7 @@ export default function OnboardingScreen() {
             fullWidth size="lg"
           />
         )}
-        <TouchableOpacity onPress={handleComplete} style={styles.skipBtn}>
+        <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}>
           <Text style={styles.skipText}>Skip for now</Text>
         </TouchableOpacity>
       </View>

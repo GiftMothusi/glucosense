@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { glucoseApi } from '../services/api';
+import { syncHealthConnectReadings } from '../services/healthConnectService';
 
 export interface GlucoseReading {
   id: number;
@@ -43,6 +44,10 @@ interface GlucoseState {
   isLogging: boolean;
   error: string | null;
 
+  syncStatus: 'idle' | 'syncing' | 'success' | 'error' | 'unavailable';
+  lastSyncedAt: string | null;
+  healthConnectEnabled: boolean;
+
   fetchLatest: () => Promise<void>;
   fetchStats: (days?: number) => Promise<void>;
   fetchReadings: (days?: number) => Promise<void>;
@@ -55,6 +60,9 @@ interface GlucoseState {
     meal_id?: number;
   }) => Promise<GlucoseReading | null>;
   deleteReading: (id: number) => Promise<void>;
+  setSyncStatus: (status: 'idle' | 'syncing' | 'success' | 'error' | 'unavailable') => void;
+  setHealthConnectEnabled: (enabled: boolean) => void;
+  triggerHealthConnectSync: (daysSince?: number) => Promise<void>;
 }
 
 export const useGlucoseStore = create<GlucoseState>((set, get) => ({
@@ -66,6 +74,9 @@ export const useGlucoseStore = create<GlucoseState>((set, get) => ({
   isLoading: false,
   isLogging: false,
   error: null,
+  syncStatus: 'idle',
+  lastSyncedAt: null,
+  healthConnectEnabled: false,
 
   fetchLatest: async () => {
     try {
@@ -138,6 +149,26 @@ export const useGlucoseStore = create<GlucoseState>((set, get) => ({
       }));
     } catch {
       // silent
+    }
+  },
+
+  setSyncStatus: (status) => set({ syncStatus: status }),
+
+  setHealthConnectEnabled: (enabled) => set({ healthConnectEnabled: enabled }),
+
+  triggerHealthConnectSync: async (daysSince = 1) => {
+    set({ syncStatus: 'syncing' });
+    try {
+      const result = await syncHealthConnectReadings(daysSince);
+      if (result === null) {
+        set({ syncStatus: 'unavailable' });
+        return;
+      }
+      set({ syncStatus: 'success', lastSyncedAt: new Date().toISOString() });
+      await get().fetchLatest();
+      await get().fetchStats(7);
+    } catch {
+      set({ syncStatus: 'error' });
     }
   },
 }));
